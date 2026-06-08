@@ -1,2 +1,1 @@
-# STIGMA_QR
-발표용 스티그마 웹페이지
+STIGMA 기말 발표용 HTML
