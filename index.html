@@ -1,0 +1,800 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<title>스티그마 — 팀 발표</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Black+Han+Sans&family=Oswald:wght@300;400;500;600;700&family=Noto+Sans+KR:wght@300;400;500;700;900&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<script src="assets/deck-stage.js"></script>
+<script src="assets/image-slot.js"></script>
+<style>
+  :root {
+    --void: #07070A;
+    --panel: #0E0E12;
+    --panel-2: #16161C;
+    --bone: #ECE6DB;
+    --bone-dim: #A9A39A;
+    --ash: #6E6A64;
+    --ash-2: #403D39;
+    --blood: #DA291C;
+    --blood-2: #F03A2C;
+    --blood-deep: #6E140D;
+    --line: #24232A;
+    --line-2: #34323B;
+    --poster: 'Black Han Sans', 'Noto Sans KR', sans-serif;
+    --cond: 'Oswald', 'Noto Sans KR', sans-serif;
+    --sans: 'Noto Sans KR', sans-serif;
+    --mono: 'JetBrains Mono', ui-monospace, monospace;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; background: #000; }
+  deck-stage { --slide-w: 1920px; --slide-h: 1080px; background: #000; }
+  deck-stage > section {
+    width: 1920px; height: 1080px;
+    background: var(--void);
+    color: var(--bone);
+    font-family: var(--sans);
+    position: relative;
+    overflow: hidden;
+  }
+  /* film grain + vignette on every slide */
+  section::before {
+    content: ''; position: absolute; inset: 0; z-index: 60; pointer-events: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    opacity: 0.06; mix-blend-mode: overlay;
+  }
+  section::after {
+    content: ''; position: absolute; inset: 0; z-index: 55; pointer-events: none;
+    background: radial-gradient(ellipse 80% 70% at 50% 42%, transparent 40%, rgba(0,0,0,0.55) 100%);
+  }
+
+  /* ───── shared cinematic chrome ───── */
+  .reel {
+    display: none;
+  }
+  .reel b { color: var(--blood); font-weight: 700; }
+  .reel .sq { width: 9px; height: 9px; background: var(--blood); display: inline-block; }
+  .tc {
+    display: none;
+  }
+  .pgn {
+    position: absolute; bottom: 54px; left: 72px; z-index: 40;
+    font-family: var(--cond); font-size: 17px; letter-spacing: 0.3em; color: var(--ash);
+  }
+  /* inset hairline frame */
+  .frame-edge {
+    position: absolute; inset: 40px; z-index: 38; pointer-events: none;
+    border: 1px solid rgba(236,230,219,0.08);
+  }
+
+  /* full-bleed image helper */
+  .bleed { position: absolute; inset: 0; z-index: 1; background-position: center; background-size: cover; background-repeat: no-repeat; }
+  .bleed.noir { filter: grayscale(0.72) contrast(1.06) brightness(0.6); }
+  .redwash { position: absolute; inset: 0; z-index: 2; pointer-events: none; }
+  .redwash.glow { background: radial-gradient(ellipse 60% 55% at 62% 40%, rgba(218,41,28,0.30), transparent 62%); mix-blend-mode: screen; }
+  .scrim-b { position: absolute; inset: 0; z-index: 3; pointer-events: none; background: linear-gradient(180deg, transparent 30%, rgba(7,7,10,0.72) 72%, var(--void) 100%); }
+  .scrim-l { position: absolute; inset: 0; z-index: 3; pointer-events: none; background: linear-gradient(90deg, rgba(7,7,10,0.92) 0%, rgba(7,7,10,0.5) 40%, transparent 70%); }
+
+  /* ───── shared type atoms ───── */
+  .overline { font-family: var(--cond); font-size: 22px; font-weight: 600; letter-spacing: 0.46em; color: var(--blood); text-transform: uppercase; }
+  .overline.bone { color: var(--bone-dim); }
+  .kho { font-family: var(--poster); color: var(--bone); line-height: 1.0; letter-spacing: 0.01em; }
+  .body { font-family: var(--sans); color: var(--bone-dim); line-height: 1.7; font-weight: 300; }
+  .rule-red { width: 92px; height: 4px; background: var(--blood); }
+  .content { position: absolute; z-index: 20; }
+  .tag {
+    font-family: var(--cond); font-size: 22px; font-weight: 600; letter-spacing: 0.22em;
+    text-transform: uppercase; color: var(--bone); border: 1px solid rgba(218,41,28,0.45);
+    padding: 14px 26px; white-space: nowrap; border-radius: 2px;
+    background: linear-gradient(180deg, rgba(218,41,28,0.12), rgba(20,16,18,0.55));
+    box-shadow: 0 0 22px rgba(218,41,28,0.14), inset 0 1px 0 rgba(255,255,255,0.04);
+    backdrop-filter: blur(2px);
+  }
+
+  /* ════════ SLIDE 1 — COVER / POSTER ════════ */
+  .cover .key { background-position: center 8%; }
+  .cover .eye {
+    position: absolute; left: 48.5%; top: 514px; transform: translate(-50%,-50%);
+    width: 360px; height: 360px; z-index: 22; pointer-events: none; mix-blend-mode: screen;
+    background: radial-gradient(circle, rgba(255,246,220,0.92) 0%, rgba(255,186,84,0.8) 10%, rgba(236,82,30,0.55) 26%, rgba(150,28,12,0.22) 46%, transparent 68%);
+    filter: blur(2.5px);
+    animation: eyeGlow 3.4s ease-in-out infinite;
+  }
+  .cover .eye::before {
+    content: ''; position: absolute; left: 50%; top: 50%; transform: translate(-50%,-50%);
+    width: 110px; height: 110px; border-radius: 50%;
+    background: radial-gradient(circle, rgba(255,234,186,0.7) 0%, rgba(255,168,58,0.45) 48%, transparent 80%);
+    filter: blur(8px);
+  }
+  .cover .eye::after {
+    content: ''; position: absolute; left: 50%; top: 50%; transform: translate(-50%,-50%);
+    width: 52px; height: 52px; border-radius: 50%;
+    background: radial-gradient(circle, #fff 0%, #ffefc6 36%, rgba(255,160,50,0.6) 72%, transparent 100%);
+    filter: blur(1.5px);
+  }
+  .cover .streak {
+    position: absolute; left: 50%; top: 514px; transform: translate(-50%,-50%);
+    width: 880px; height: 5px; z-index: 22; pointer-events: none; mix-blend-mode: screen;
+    background: linear-gradient(90deg, transparent 6%, rgba(255,160,66,0.28) 38%, rgba(255,236,200,0.7) 50%, rgba(255,160,66,0.28) 62%, transparent 94%);
+    filter: blur(2px);
+    animation: streakGlow 3.4s ease-in-out infinite;
+  }
+  @keyframes eyeGlow {
+    0%, 100% { opacity: 0.78; transform: translate(-50%,-50%) scale(0.95); }
+    50% { opacity: 1; transform: translate(-50%,-50%) scale(1.06); }
+  }
+  @keyframes streakGlow {
+    0%, 100% { opacity: 0.5; transform: translate(-50%,-50%) scaleX(0.95); }
+    50% { opacity: 0.85; transform: translate(-50%,-50%) scaleX(1.02); }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .cover .eye, .cover .streak { animation: none; }
+  }
+  .cover .billing-top {
+    position: absolute; top: 150px; left: 0; right: 0; z-index: 20; text-align: center;
+    font-family: var(--cond); font-size: 26px; font-weight: 500; letter-spacing: 0.5em;
+    color: var(--bone-dim); text-transform: uppercase;
+  }
+  .cover .logo { position: absolute; left: 50%; top: 384px; transform: translateX(-50%); width: 760px; z-index: 21; }
+  .cover .logline {
+    position: absolute; left: 0; right: 0; top: 638px; z-index: 21; text-align: center;
+    font-family: var(--poster); font-size: 46px; color: var(--bone); letter-spacing: 0.04em;
+  }
+  .cover .logline em { font-style: normal; color: var(--blood); }
+  .cover .gtags { position: absolute; left: 0; right: 0; top: 726px; z-index: 21; display: flex; gap: 22px; justify-content: center; }
+  .cover .credits {
+    position: absolute; left: 50%; bottom: 116px; transform: translateX(-50%); z-index: 21;
+    width: 1180px; text-align: center;
+    font-family: var(--cond); font-weight: 300; font-size: 20px; letter-spacing: 0.12em;
+    color: var(--bone-dim); line-height: 1.85; text-transform: uppercase;
+  }
+  .cover .credits b { color: var(--bone); font-weight: 600; }
+  .cover .credits .big { font-size: 23px; }
+
+  /* ════════ SLIDE 2 — LOGLINE ════════ */
+  .logl .center { position: absolute; inset: 0; z-index: 20; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 0 200px; }
+  .logl .ql { font-family: var(--poster); font-size: 88px; line-height: 1.22; color: var(--bone); letter-spacing: 0.01em; white-space: nowrap; }
+  .logl .ql em { font-style: normal; color: var(--blood); }
+  .logl .sub { font-family: var(--sans); font-weight: 300; font-size: 28px; color: var(--bone-dim); margin-top: 64px; line-height: 1.7; letter-spacing: 0.02em; }
+  .logl .markq { font-family: var(--poster); font-size: 360px; color: var(--blood); opacity: 0.07; position: absolute; top: 120px; left: 50%; transform: translateX(-50%); z-index: 10; }
+
+  /* ════════ SLIDE 3 — OVERVIEW (spec sheet) ════════ */
+  .ovw .head { position: absolute; left: 96px; top: 140px; z-index: 20; }
+  .ovw .spec { position: absolute; left: 96px; right: 96px; top: 400px; z-index: 20; border-top: 1px solid var(--line-2); }
+  .ovw .srow { display: grid; grid-template-columns: 320px 1fr; border-bottom: 1px solid var(--line); align-items: center; padding: 34px 8px; }
+  .ovw .srow .k { font-family: var(--cond); font-size: 22px; font-weight: 600; letter-spacing: 0.3em; color: var(--blood); text-transform: uppercase; }
+  .ovw .srow .v { font-family: var(--sans); font-size: 34px; color: var(--bone); font-weight: 500; }
+  .ovw .srow .v small { font-family: var(--mono); font-size: 19px; color: var(--ash); margin-left: 16px; letter-spacing: 0.05em; }
+  .ovw .status-pill { display: inline-flex; align-items: center; gap: 12px; }
+  .ovw .status-pill .dot { width: 12px; height: 12px; border-radius: 50%; background: var(--blood); box-shadow: 0 0 14px var(--blood); }
+
+  /* ════════ SLIDE 4 — FEATURE INDEX (chapters) ════════ */
+  .idx .head { position: absolute; left: 96px; top: 140px; z-index: 20; }
+  .idx .list { position: absolute; left: 96px; right: 96px; top: 340px; z-index: 20; }
+  .idx .ch {
+    display: grid; grid-template-columns: 96px 1fr auto; align-items: center;
+    border-top: 1px solid var(--line); padding: 16px 6px; gap: 28px;
+    transition: none;
+  }
+  .idx .ch:last-child { border-bottom: 1px solid var(--line); }
+  .idx .ch .no { font-family: var(--mono); font-size: 24px; color: var(--blood); letter-spacing: 0.1em; }
+  .idx .ch .nm { font-family: var(--poster); font-size: 36px; color: var(--bone); letter-spacing: 0.02em; }
+  .idx .ch .nm span { font-family: var(--cond); font-size: 22px; font-weight: 400; color: var(--ash); letter-spacing: 0.2em; margin-left: 22px; text-transform: uppercase; }
+  .idx .ch .st { font-family: var(--cond); font-size: 18px; font-weight: 600; letter-spacing: 0.22em; text-transform: uppercase; color: var(--bone-dim); display: flex; align-items: center; gap: 12px; }
+  .idx .ch .st .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--blood); }
+
+  /* ════════ FEATURE SHOWCASE (5-8) ════════ */
+  .feat .stage { position: absolute; inset: 0; z-index: 1; }
+  .feat .panel {
+    position: absolute; z-index: 20; top: 0; bottom: 0; width: 880px;
+    display: flex; flex-direction: column; justify-content: center; padding: 0 96px;
+  }
+  .feat .panel.left { left: 0; }
+  .feat .fno { font-family: var(--mono); font-size: 23px; color: var(--blood); letter-spacing: 0.3em; }
+  .feat .ttl { font-family: var(--poster); font-size: 84px; color: var(--bone); line-height: 1.04; margin-top: 22px; letter-spacing: 0.01em; white-space: nowrap; }
+  .feat .en { font-family: var(--cond); font-size: 28px; font-weight: 500; letter-spacing: 0.4em; color: var(--bone-dim); text-transform: uppercase; margin-top: 18px; }
+  .feat .lead { font-family: var(--sans); font-weight: 300; font-size: 31px; color: var(--bone-dim); line-height: 1.6; margin-top: 40px; max-width: 720px; word-break: keep-all; }
+  .feat .lead b { color: var(--bone); font-weight: 600; }
+  .feat .caps { margin-top: 42px; display: flex; flex-direction: column; gap: 22px; }
+  .feat .cap { display: flex; align-items: flex-start; gap: 20px; font-family: var(--sans); font-size: 27px; color: var(--bone); line-height: 1.38; }
+  .feat .cap .mk { color: var(--blood); font-family: var(--mono); font-size: 24px; margin-top: 3px; }
+  .feat .cap small { display: block; font-size: 25px; color: var(--bone-dim); margin-top: 9px; font-weight: 400; line-height: 1.45; }
+  .feat .works {
+    margin-top: 46px; display: inline-flex; align-items: center; gap: 14px; align-self: flex-start;
+    font-family: var(--cond); font-size: 20px; font-weight: 600; letter-spacing: 0.26em; text-transform: uppercase;
+    color: var(--bone); border: 1px solid var(--blood); padding: 12px 22px; background: rgba(218,41,28,0.08); white-space: nowrap;
+  }
+  .feat .works .dot { width: 9px; height: 9px; border-radius: 50%; background: var(--blood); box-shadow: 0 0 12px var(--blood); }
+
+  /* framed figure (node map / combat shot) */
+  .figframe { position: absolute; right: 76px; top: 50%; transform: translateY(-50%); width: 1000px; height: 700px; z-index: 20; border: 1px solid var(--line-2); background: var(--panel-2); padding: 14px; }
+  .figframe img, .figframe image-slot { display: block; width: 100%; height: 100%; object-fit: cover; }
+  .figframe .cap { position: absolute; bottom: -38px; right: 0; font-family: var(--mono); font-size: 15px; letter-spacing: 0.16em; color: var(--ash); }
+  .figframe .corner-tl, .figframe .corner-br { position: absolute; width: 22px; height: 22px; border: 2px solid var(--blood); }
+  .figframe .corner-tl { top: -1px; left: -1px; border-right: none; border-bottom: none; }
+  .figframe .corner-br { bottom: -1px; right: -1px; border-left: none; border-top: none; }
+  .feat .panel.narrow { width: 820px; }
+  .feat .gauge {
+    position: absolute; right: 80px; bottom: 80px; width: 820px; z-index: 21;
+    border: 1px solid var(--line-2); background: rgba(10,10,14,0.72); padding: 12px;
+    backdrop-filter: blur(2px);
+  }
+  .feat .gauge .glabel {
+    position: absolute; top: -32px; left: 2px; white-space: nowrap;
+    font-family: var(--cond); font-size: 16px; font-weight: 600; letter-spacing: 0.2em;
+    color: var(--label); text-transform: uppercase;
+  }
+  .feat .gauge image-slot { display: block; width: 100%; height: 150px; --image-slot-bg: #07070A; }
+
+  /* ════ SLIDE 9 — CUTSCENE (animated) ════ */
+  .cut .cut-title {
+    position: absolute; left: 50%; top: 50%; transform: translate(-50%,-50%) scale(1);
+    z-index: 30; white-space: nowrap; opacity: 0;
+    font-family: var(--poster); font-size: 132px; line-height: 1; letter-spacing: 0.02em; color: var(--bone);
+    text-shadow: 0 6px 40px rgba(0,0,0,0.8);
+  }
+  .cut .cut-title em { font-style: normal; color: var(--blood); }
+  .cut .cut-stage {
+    position: absolute; left: 50%; top: 47%; transform: translate(-50%,-50%) scale(0.97);
+    width: 1560px; height: 878px; z-index: 20; opacity: 0;
+    border: 1px solid var(--line-2); background: #000; overflow: hidden;
+    box-shadow: 0 40px 120px rgba(0,0,0,0.7);
+  }
+  .cut .cut-video { width: 100%; height: 100%; object-fit: contain; display: block; background: #000; }
+  .cut .cut-ph {
+    position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
+    font-family: var(--sans); font-size: 24px; color: var(--ash); font-weight: 300; text-align: center; padding: 0 40px;
+    background: repeating-linear-gradient(45deg, #0C0C10 0 22px, #101015 22px 44px);
+  }
+  .cut .cut-ph b { color: var(--bone-dim); font-family: var(--mono); font-weight: 500; }
+  .cut .cut-video[src] + .cut-ph { display: none; }
+  .cut .cut-toggle {
+    position: absolute; left: 24px; bottom: 24px; z-index: 25;
+    width: 64px; height: 64px; border-radius: 50%; cursor: pointer;
+    border: 1px solid rgba(236,230,219,0.35); background: rgba(7,7,10,0.6);
+    color: var(--bone); backdrop-filter: blur(4px);
+    display: flex; align-items: center; justify-content: center;
+    font-family: var(--mono); font-size: 20px; transition: background .15s, transform .1s;
+  }
+  .cut .cut-toggle:hover { background: var(--blood); border-color: var(--blood); }
+  .cut .cut-toggle:active { transform: scale(0.94); }
+  .cut .cut-toggle .ico-play { display: none; padding-left: 3px; }
+  .cut .cut-toggle.paused .ico-pause { display: none; }
+  .cut .cut-toggle.paused .ico-play { display: inline; }
+
+  /* entrance: title holds center ~3s, then slides down-left small; stage fades in */
+  .cut[data-deck-active] .cut-title { animation: cutTitleMove 4.2s cubic-bezier(.65,0,.2,1) forwards; }
+  .cut[data-deck-active] .cut-stage { animation: cutStageIn 1.1s ease-out 3.3s forwards; }
+  @keyframes cutTitleMove {
+    0%   { opacity: 0; transform: translate(-50%,-50%) scale(1.06); }
+    7%   { opacity: 1; transform: translate(-50%,-50%) scale(1); }
+    72%  { opacity: 1; left: 50%; top: 50%; transform: translate(-50%,-50%) scale(1); }
+    100% { opacity: 1; left: 21%; top: 90.5%; transform: translate(-50%,-50%) scale(0.34); }
+  }
+  @keyframes cutStageIn {
+    from { opacity: 0; transform: translate(-50%,-50%) scale(0.97); }
+    to   { opacity: 1; transform: translate(-50%,-50%) scale(1); }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .cut[data-deck-active] .cut-title { animation: none; opacity: 1; left: 21%; top: 90.5%; transform: translate(-50%,-50%) scale(0.34); }
+    .cut[data-deck-active] .cut-stage { animation: none; opacity: 1; transform: translate(-50%,-50%) scale(1); }
+  }
+
+  /* ════ SLIDE 10 — SYSTEMS / OPTIONS ════ */
+  .sys .head { position: absolute; left: 96px; top: 140px; z-index: 20; }
+  .sys .modules { position: absolute; left: 96px; right: 96px; top: 400px; z-index: 20; display: grid; grid-template-columns: repeat(3, 1fr); gap: 22px; }
+  .sys .mod { border: 1px solid var(--line); background: var(--panel-2); padding: 34px 36px 38px; position: relative; min-height: 220px; }
+  .sys .mod .nm { font-family: var(--poster); font-size: 34px; color: var(--bone); letter-spacing: 0.01em; }
+  .sys .mod .en { font-family: var(--mono); font-size: 15px; letter-spacing: 0.14em; color: var(--ash); margin-top: 10px; }
+  .sys .mod .ds { font-family: var(--sans); font-weight: 300; font-size: 21px; color: var(--bone-dim); margin-top: 22px; line-height: 1.55; }
+  .sys .mod .ok { position: absolute; top: 32px; right: 34px; font-family: var(--cond); font-size: 15px; font-weight: 600; letter-spacing: 0.2em; color: var(--blood); }
+  .sys .optpanel { position: absolute; right: 96px; top: 392px; width: 660px; z-index: 20; border: 1px solid var(--line-2); background: rgba(14,14,18,0.92); padding: 38px 42px 44px; }
+  .sys .optpanel .ph { font-family: var(--cond); font-size: 20px; font-weight: 600; letter-spacing: 0.34em; color: var(--bone-dim); text-transform: uppercase; padding-bottom: 22px; border-bottom: 1px solid var(--line); }
+  .sys .optrow { display: flex; align-items: center; justify-content: space-between; padding: 28px 0; border-bottom: 1px solid var(--line); }
+  .sys .optrow .lb { font-family: var(--sans); font-size: 24px; color: var(--bone); font-weight: 500; }
+  .sys .slider { width: 300px; height: 8px; background: var(--ash-2); position: relative; }
+  .sys .slider .fill { position: absolute; left: 0; top: 0; bottom: 0; width: 72%; background: var(--blood); }
+  .sys .slider .knob { position: absolute; left: 72%; top: 50%; transform: translate(-50%,-50%); width: 22px; height: 22px; border-radius: 50%; background: var(--bone); box-shadow: 0 0 12px rgba(218,41,28,0.6); }
+  .sys .switch { width: 70px; height: 32px; border-radius: 999px; background: var(--blood); position: relative; }
+  .sys .switch .k { position: absolute; right: 4px; top: 50%; transform: translateY(-50%); width: 24px; height: 24px; border-radius: 50%; background: var(--bone); }
+  .sys .optval { font-family: var(--mono); font-size: 20px; color: var(--bone-dim); }
+
+  /* ════ SLIDE 11 — ART GALLERY ════ */
+  .gal .head { position: absolute; left: 96px; top: 140px; z-index: 20; }
+  .gal .grid { position: absolute; left: 96px; right: 96px; top: 392px; bottom: 130px; z-index: 20; display: grid; grid-template-columns: 1.3fr 1fr 1fr; grid-template-rows: 1fr 1fr; gap: 18px; }
+  .gal .cell { border: 1px solid var(--line-2); background: var(--panel-2); position: relative; overflow: hidden; }
+  .gal .cell.hero { grid-row: span 2; }
+  .gal .cell img, .gal .cell image-slot { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .gal .cell .lbl { position: absolute; left: 18px; bottom: 16px; z-index: 3; font-family: var(--cond); font-size: 17px; font-weight: 600; letter-spacing: 0.18em; text-transform: uppercase; color: var(--bone); text-shadow: 0 2px 8px #000; }
+  .gal .cell .lblbg { position: absolute; left: 0; right: 0; bottom: 0; height: 90px; z-index: 2; background: linear-gradient(180deg, transparent, rgba(0,0,0,0.8)); pointer-events: none; }
+
+  /* ════ SLIDE 12 — STATUS / ROADMAP ════ */
+  .road .head { position: absolute; left: 96px; top: 140px; z-index: 20; }
+  .road .cols { position: absolute; left: 96px; right: 96px; top: 400px; z-index: 20; display: grid; grid-template-columns: 1fr 1fr; gap: 64px; }
+  .road .col .ch { font-family: var(--cond); font-size: 22px; font-weight: 600; letter-spacing: 0.3em; text-transform: uppercase; display: flex; align-items: center; gap: 16px; padding-bottom: 26px; border-bottom: 2px solid var(--line-2); }
+  .road .col.now .ch { color: var(--blood); }
+  .road .col.next .ch { color: var(--bone-dim); }
+  .road .col .ch .dot { width: 11px; height: 11px; border-radius: 50%; }
+  .road .col.now .ch .dot { background: var(--blood); box-shadow: 0 0 12px var(--blood); }
+  .road .col.next .ch .dot { background: var(--ash); }
+  .road .col .it { display: flex; gap: 18px; align-items: flex-start; padding: 24px 0; border-bottom: 1px solid var(--line); font-family: var(--sans); font-size: 25px; color: var(--bone); line-height: 1.4; }
+  .road .col .it .mk { font-family: var(--mono); font-size: 19px; margin-top: 4px; }
+  .road .col.now .it .mk { color: var(--blood); }
+  .road .col.next .it { color: var(--bone-dim); }
+  .road .col.next .it .mk { color: var(--ash); }
+
+  /* ════ SLIDE 13 — CREDITS + QR ════ */
+  .cred .center { position: absolute; left: 0; right: 0; top: 168px; z-index: 20; text-align: center; }
+  .cred .pre { font-family: var(--cond); font-size: 32px; font-weight: 500; letter-spacing: 0.5em; color: var(--blood); text-transform: uppercase; }
+  .cred .roll { margin-top: 76px; display: flex; flex-direction: column; gap: 58px; align-items: center; }
+  .cred .crow { text-align: center; }
+  .cred .crow .role { font-family: var(--cond); font-size: 23px; font-weight: 500; letter-spacing: 0.3em; color: var(--ash); text-transform: uppercase; white-space: nowrap; }
+  .cred .crow .nm { font-family: var(--poster); font-size: 58px; color: var(--bone); margin-top: 16px; letter-spacing: 0.03em; white-space: nowrap; }
+  .cred .crow .nm.multi { font-size: 48px; }
+  .cred .qr { position: absolute; right: 120px; bottom: 110px; z-index: 20; text-align: center; }
+  .cred .qr .fr { width: 220px; height: 220px; background: #fff; padding: 12px; border: 1px solid var(--line-2); }
+  .cred .qr .fr img { width: 100%; height: 100%; object-fit: contain; display: block; }
+  .cred .qr .cap { font-family: var(--cond); font-size: 16px; letter-spacing: 0.24em; color: var(--bone-dim); margin-top: 16px; text-transform: uppercase; }
+  .cred .fin { position: absolute; left: 120px; bottom: 130px; z-index: 20; font-family: var(--poster); font-size: 88px; color: var(--bone); letter-spacing: 0.1em; }
+  .cred .fin em { font-style: normal; color: var(--blood); }
+</style>
+</head>
+<body>
+
+<deck-stage data-om-id="0d88f0b4:7" style="--deck-rail-w: 188px;">
+
+  <!-- ════ 1 · COVER ════ -->
+  <section class="cover" data-screen-label="01 표지" data-om-id="0d88f0b4:8" data-om-validate="no_overflowing_text,no_overlapping_text,slide_sized_text" data-deck-slide="0">
+    <div class="bleed" style="background:#000" data-om-id="0d88f0b4:9"></div>
+    <div class="redwash" style="background:radial-gradient(ellipse 42% 30% at 48.5% 47.6%, rgba(140,40,16,0.40), transparent 62%)" data-om-id="0d88f0b4:10"></div>
+    <div class="frame-edge" data-om-id="0d88f0b4:11"></div>
+
+    <div class="billing-top" data-om-id="0d88f0b4:12">짱돌 &nbsp;PRESENTS</div>
+    <img class="logo" src="assets/stigma_logo.png" alt="STIGMA" data-om-id="0d88f0b4:13">
+    <div class="eye" data-om-id="0d88f0b4:14"></div>
+    <div class="streak" data-om-id="0d88f0b4:15"></div>
+    <div class="gtags" style="top:684px;" data-om-id="0d88f0b4:16">
+      <span class="tag" data-om-id="0d88f0b4:17">로그라이크</span>
+      <span class="tag" data-om-id="0d88f0b4:18">덱빌더</span>
+      <span class="tag" data-om-id="0d88f0b4:19">코즈믹 호러</span>
+    </div>
+
+    <div class="credits" data-om-id="0d88f0b4:20">
+      명지전문대학교 AI게임소프트웨어학과 &nbsp;·&nbsp; <b data-om-id="0d88f0b4:21">짱돌</b> 팀 작품<br data-om-id="0d88f0b4:22">
+      <span class="big" data-om-id="0d88f0b4:23">연출·프로그래밍 <b data-om-id="0d88f0b4:24">박재환</b> &nbsp; 아트 <b data-om-id="0d88f0b4:25">정산성</b> &nbsp; 기획 <b data-om-id="0d88f0b4:26">변진수 · 백강인 · 소재민</b></span>
+    </div>
+
+    <div class="reel" data-om-id="0d88f0b4:27"><span class="sq" data-om-id="0d88f0b4:28"></span> STIGMA <b data-om-id="0d88f0b4:29">·</b> REEL 01</div>
+    <div class="tc" data-om-id="0d88f0b4:30">00:00:04:12</div>
+  </section>
+
+
+  <!-- ════ 2 · LOGLINE ════ -->
+  <section class="logl" data-screen-label="02 로그라인" data-om-id="0d88f0b4:31" data-om-validate="no_overflowing_text,no_overlapping_text,slide_sized_text" data-deck-slide="1">
+    <div class="bleed noir" style="background-image:url('assets/cthulhu_scene.png'); filter:grayscale(0.85) contrast(1.05) brightness(0.34)" data-om-id="0d88f0b4:32"></div>
+    <div class="redwash glow" style="background:radial-gradient(ellipse 50% 50% at 50% 46%, rgba(218,41,28,0.22), transparent 60%)" data-om-id="0d88f0b4:33"></div>
+    <div class="frame-edge" data-om-id="0d88f0b4:34"></div>
+
+    <div class="center" data-om-id="0d88f0b4:35">
+      <div class="ql" data-om-id="0d88f0b4:36">광기와 자원이 맞물리는<br data-om-id="0d88f0b4:37"><em data-om-id="0d88f0b4:38">덱빌딩 로그라이크</em></div>
+      <div class="sub" data-om-id="0d88f0b4:39">시선을 관리하고, 낙인을 새기고 —<br data-om-id="0d88f0b4:40">매 층 새로 짜이는 던전을 카드 한 벌로 오른다.</div>
+    </div>
+
+    <div class="reel" data-om-id="0d88f0b4:41"><span class="sq" data-om-id="0d88f0b4:42"></span> STIGMA <b data-om-id="0d88f0b4:43">·</b> REEL 02</div>
+    <div class="pgn" data-om-id="0d88f0b4:44">02 / 15</div>
+    <div class="tc" data-om-id="0d88f0b4:45">00:01:12:03</div>
+  </section>
+
+
+  <!-- ════ 3 · OVERVIEW ════ -->
+  <section class="ovw" data-screen-label="03 게임 개요" data-om-id="0d88f0b4:46" data-om-validate="no_overflowing_text,no_overlapping_text,slide_sized_text" data-deck-slide="2">
+    <div class="bleed" style="background:linear-gradient(135deg,#0B0B0F,#101015)" data-om-id="0d88f0b4:47"></div>
+    <div class="redwash glow" style="background:radial-gradient(circle at 88% 16%, rgba(218,41,28,0.16), transparent 55%)" data-om-id="0d88f0b4:48"></div>
+    <div class="frame-edge" data-om-id="0d88f0b4:49"></div>
+
+    <div class="head content" data-om-id="0d88f0b4:50">
+      <div class="overline" data-om-id="0d88f0b4:51">게임 개요</div>
+      <div class="kho" style="font-size:66px; margin-top:24px; white-space:nowrap;" data-om-id="0d88f0b4:52">한눈에 보는 스티그마</div>
+      <div class="rule-red" style="margin-top:28px;" data-om-id="0d88f0b4:53"></div>
+    </div>
+
+    <div class="spec" data-om-id="0d88f0b4:54">
+      <div class="srow" data-om-id="0d88f0b4:55"><div class="k" data-om-id="0d88f0b4:56">Genre</div><div class="v" data-om-id="0d88f0b4:57">로그라이크 덱빌더 <small data-om-id="0d88f0b4:58">ROGUELIKE / DECK-BUILDER</small></div></div>
+      <div class="srow" data-om-id="0d88f0b4:59"><div class="k" data-om-id="0d88f0b4:60">Setting</div><div class="v" data-om-id="0d88f0b4:61">크툴루 신화 · 코즈믹 호러</div></div>
+      <div class="srow" data-om-id="0d88f0b4:62"><div class="k" data-om-id="0d88f0b4:63">Engine</div><div class="v" data-om-id="0d88f0b4:64">Unity 6 <small data-om-id="0d88f0b4:65">2D-3D HYBRID</small></div></div>
+      <div class="srow" data-om-id="0d88f0b4:66"><div class="k" data-om-id="0d88f0b4:67">Core Loop</div><div class="v" data-om-id="0d88f0b4:68">노드 탐험 → 카드 전투 → 시선·낙인 → 다음 층</div></div>
+      <div class="srow" data-om-id="0d88f0b4:69"><div class="k" data-om-id="0d88f0b4:70">Build</div><div class="v" data-om-id="0d88f0b4:71"><span class="status-pill" data-om-id="0d88f0b4:72"><span class="dot" data-om-id="0d88f0b4:73"></span> 플레이 가능한 프로토타입 — 핵심 루프 작동</span></div></div>
+    </div>
+
+    <div class="reel" data-om-id="0d88f0b4:74"><span class="sq" data-om-id="0d88f0b4:75"></span> STIGMA <b data-om-id="0d88f0b4:76">·</b> REEL 03</div>
+    <div class="pgn" data-om-id="0d88f0b4:77">03 / 15</div>
+    <div class="tc" data-om-id="0d88f0b4:78">00:02:41:18</div>
+  </section>
+
+
+  <!-- ════ 4 · FEATURE INDEX ════ -->
+  <section class="idx" data-screen-label="04 기능 인덱스" data-om-id="0d88f0b4:79" data-om-validate="no_overflowing_text,no_overlapping_text,slide_sized_text" data-deck-slide="3">
+    <div class="bleed" style="background:linear-gradient(135deg,#0B0B0F,#0E0E13)" data-om-id="0d88f0b4:80"></div>
+    <div class="redwash glow" style="background:radial-gradient(circle at 12% 20%, rgba(218,41,28,0.14), transparent 50%)" data-om-id="0d88f0b4:81"></div>
+    <div class="frame-edge" data-om-id="0d88f0b4:82"></div>
+
+    <div class="head content" data-om-id="0d88f0b4:83">
+      <div class="overline" data-om-id="0d88f0b4:84">구현 기능</div>
+      <div class="kho" style="font-size:66px; margin-top:24px; white-space:nowrap;" data-om-id="0d88f0b4:85">우리가 만든 것들</div>
+      <div class="rule-red" style="margin-top:28px;" data-om-id="0d88f0b4:86"></div>
+    </div>
+
+    <div class="list" data-om-id="0d88f0b4:87">
+      <div class="ch" data-om-id="0d88f0b4:88"><div class="no" data-om-id="0d88f0b4:89">01</div><div class="nm" data-om-id="0d88f0b4:90">시선 시스템 <span data-om-id="0d88f0b4:91">Gaze</span></div></div>
+      <div class="ch" data-om-id="0d88f0b4:92"><div class="no" data-om-id="0d88f0b4:93">02</div><div class="nm" data-om-id="0d88f0b4:94">낙인 시스템 <span data-om-id="0d88f0b4:95">Stigma</span></div></div>
+      <div class="ch" data-om-id="0d88f0b4:96"><div class="no" data-om-id="0d88f0b4:97">03</div><div class="nm" data-om-id="0d88f0b4:98">절차적 노드맵 <span data-om-id="0d88f0b4:99">Node Map</span></div></div>
+      <div class="ch" data-om-id="0d88f0b4:100"><div class="no" data-om-id="0d88f0b4:101">04</div><div class="nm" data-om-id="0d88f0b4:102">카드 전투 <span data-om-id="0d88f0b4:103">Combat</span></div></div>
+      <div class="ch"><div class="no">05</div><div class="nm">외신과의 조우 <span>Encounter</span></div></div>
+      <div class="ch"><div class="no">06</div><div class="nm">상점 <span>Shop</span></div></div>
+      <div class="ch" data-om-id="0d88f0b4:108"><div class="no" data-om-id="0d88f0b4:109">07</div><div class="nm" data-om-id="0d88f0b4:110">시스템 · 옵션 <span data-om-id="0d88f0b4:111">Settings</span></div></div>
+    </div>
+
+    <div class="reel" data-om-id="0d88f0b4:112"><span class="sq" data-om-id="0d88f0b4:113"></span> STIGMA <b data-om-id="0d88f0b4:114">·</b> REEL 04</div>
+    <div class="pgn" data-om-id="0d88f0b4:115">04 / 15</div>
+    <div class="tc" data-om-id="0d88f0b4:116">00:03:55:00</div>
+  </section>
+
+
+  <!-- ════ 5 · GAZE ════ -->
+  <section class="feat" data-screen-label="05 시선 시스템" data-om-id="0d88f0b4:117" data-om-validate="no_overflowing_text,no_overlapping_text,slide_sized_text" data-deck-slide="4">
+    <div class="bleed noir stage" style="background-image:url('assets/red_eye_scene.png'); background-position:center" data-om-id="0d88f0b4:118"></div>
+    <div class="redwash glow" style="background:radial-gradient(ellipse 50% 60% at 70% 45%, rgba(218,41,28,0.34), transparent 60%); mix-blend-mode:screen;" data-om-id="0d88f0b4:119"></div>
+    <div class="scrim-l" data-om-id="0d88f0b4:120"></div>
+    <div class="frame-edge" data-om-id="0d88f0b4:121"></div>
+
+    <div class="panel left" data-om-id="0d88f0b4:122">
+      <div class="fno" data-om-id="0d88f0b4:123">FEATURE 01</div>
+      <div class="ttl" data-om-id="0d88f0b4:124">시선</div>
+      <div class="en" data-om-id="0d88f0b4:125">Gaze System</div>
+      <div class="lead" data-om-id="0d88f0b4:126">보면 볼수록 <b data-om-id="0d88f0b4:127">외신에게 인지된다.</b> 인지를 자원으로 바꾼 핵심 메커닉 — 누적될수록 디버프가 거세진다.</div>
+      <div class="caps" data-om-id="0d88f0b4:128">
+        <div class="cap" data-om-id="0d88f0b4:129"><span class="mk" data-om-id="0d88f0b4:130">▸</span><div data-om-id="0d88f0b4:131">0 → 100 누적 게이지<small data-om-id="0d88f0b4:132">임계치마다 디버프가 단계적으로 강화</small></div></div>
+        <div class="cap" data-om-id="0d88f0b4:133"><span class="mk" data-om-id="0d88f0b4:134">▸</span><div data-om-id="0d88f0b4:135">100 도달 시 외신의 강림<small data-om-id="0d88f0b4:136">판을 뒤집는 위기 이벤트 발동</small></div></div>
+        <div class="cap" data-om-id="0d88f0b4:137"><span class="mk" data-om-id="0d88f0b4:138">▸</span><div data-om-id="0d88f0b4:139">5개 효과 풀 무작위 조합<small data-om-id="0d88f0b4:140">매 런 1,024가지 빌드 변주</small></div></div>
+      </div>
+    </div>
+
+    <div class="gauge" data-om-id="0d88f0b4:141">
+      <div class="glabel" data-om-id="0d88f0b4:142">IN-GAME · 시선 게이지</div>
+      <image-slot id="gaze-gauge" fit="contain" shape="rect" placeholder="인게임 시선 게이지 캡처를 드래그" data-om-id="0d88f0b4:143" data-editable="" data-filled=""></image-slot>
+    </div>
+
+    <div class="reel" data-om-id="0d88f0b4:144"><span class="sq" data-om-id="0d88f0b4:145"></span> STIGMA <b data-om-id="0d88f0b4:146">·</b> REEL 05</div>
+    <div class="pgn" data-om-id="0d88f0b4:147">05 / 15</div>
+    <div class="tc" data-om-id="0d88f0b4:148">00:05:20:14</div>
+  </section>
+
+
+  <!-- ════ 6 · STIGMA ════ -->
+  <section class="feat" data-screen-label="06 낙인 시스템" data-om-id="0d88f0b4:149" data-om-validate="no_overflowing_text,no_overlapping_text,slide_sized_text" data-deck-slide="5">
+    <div class="bleed" style="background:linear-gradient(120deg,#0C0B0F,#100E13)" data-om-id="0d88f0b4:150"></div>
+    <div class="redwash glow" style="background:radial-gradient(circle at 86% 30%, rgba(218,41,28,0.16), transparent 54%)" data-om-id="0d88f0b4:151"></div>
+    <div class="frame-edge" data-om-id="0d88f0b4:152"></div>
+
+    <div class="panel left narrow" data-om-id="0d88f0b4:153">
+      <div class="fno" data-om-id="0d88f0b4:154">FEATURE 02</div>
+      <div class="ttl" data-om-id="0d88f0b4:155">낙인</div>
+      <div class="en" data-om-id="0d88f0b4:156">Stigma System</div>
+      <div class="lead" data-om-id="0d88f0b4:157">한 번의 선택이 <b data-om-id="0d88f0b4:158">런이 끝날 때까지 영구히</b> 남는다. 양자택일이 만드는 되돌릴 수 없는 무게.</div>
+      <div class="caps" data-om-id="0d88f0b4:159">
+        <div class="cap" data-om-id="0d88f0b4:160"><span class="mk" data-om-id="0d88f0b4:161">A</span><div data-om-id="0d88f0b4:162">시선 효과 영구 교체<small data-om-id="0d88f0b4:163">활성 효과 하나를 다른 풀로 치환</small></div></div>
+        <div class="cap" data-om-id="0d88f0b4:164"><span class="mk" data-om-id="0d88f0b4:165">B</span><div data-om-id="0d88f0b4:166">카드 영구 제거<small data-om-id="0d88f0b4:167">덱에서 한 장을 런 종료까지 삭제</small></div></div>
+        <div class="cap" data-om-id="0d88f0b4:168"><span class="mk" data-om-id="0d88f0b4:169">▸</span><div data-om-id="0d88f0b4:170">덱빌딩 + 메타 룰빌딩<small data-om-id="0d88f0b4:171">두 층위의 의사결정이 맞물린다</small></div></div>
+      </div>
+    </div>
+
+    <div class="figframe" data-om-id="0d88f0b4:172">
+      <div class="corner-tl" data-om-id="0d88f0b4:173"></div><div class="corner-br" data-om-id="0d88f0b4:174"></div>
+      <video src="assets/stigma_demo.mp4" autoplay muted loop playsinline style="width:100%;height:100%;object-fit:contain;background:#07070A;" data-om-id="0d88f0b4:175"></video>
+      <div class="cap" data-om-id="0d88f0b4:176">IN-GAME · 낙인 연출</div>
+    </div>
+
+    <div class="pgn" data-om-id="0d88f0b4:177">06 / 15</div>
+  </section>
+
+
+  <!-- ════ 7 · NODE MAP ════ -->
+  <section class="feat" data-screen-label="07 절차적 노드맵" data-om-id="0d88f0b4:178" data-om-validate="no_overflowing_text,no_overlapping_text,slide_sized_text" data-deck-slide="6">
+    <div class="bleed" style="background:linear-gradient(120deg,#0B0B0F,#0E0E13)" data-om-id="0d88f0b4:179"></div>
+    <div class="redwash glow" style="background:radial-gradient(circle at 14% 24%, rgba(218,41,28,0.14), transparent 50%)" data-om-id="0d88f0b4:180"></div>
+    <div class="frame-edge" data-om-id="0d88f0b4:181"></div>
+
+    <div class="panel left narrow" data-om-id="0d88f0b4:182">
+      <div class="fno" data-om-id="0d88f0b4:183">FEATURE 03</div>
+      <div class="ttl" data-om-id="0d88f0b4:184">절차적 노드맵</div>
+      <div class="en" data-om-id="0d88f0b4:185">Procedural Node Map</div>
+      <div class="lead" data-om-id="0d88f0b4:186">매 런마다 <b data-om-id="0d88f0b4:187">새로 생성되는 던전.</b> 같은 길은 두 번 없다.</div>
+      <div class="caps" data-om-id="0d88f0b4:188">
+        <div class="cap" data-om-id="0d88f0b4:189"><span class="mk" data-om-id="0d88f0b4:190">▸</span><div data-om-id="0d88f0b4:191">층마다 자동 생성되는 경로<small data-om-id="0d88f0b4:192">전투 · 상점 · 낙인 · 이벤트 노드</small></div></div>
+        <div class="cap" data-om-id="0d88f0b4:193"><span class="mk" data-om-id="0d88f0b4:194">▸</span><div data-om-id="0d88f0b4:195">플레이어 자유 드로잉 메모<small data-om-id="0d88f0b4:196">경로를 직접 표시하며 계획</small></div></div>
+      </div>
+    </div>
+
+    <div class="figframe" data-om-id="0d88f0b4:197">
+      <div class="corner-tl" data-om-id="0d88f0b4:198"></div><div class="corner-br" data-om-id="0d88f0b4:199"></div>
+      <img src="assets/nodemap_demo.gif" alt="노드맵 생성" style="width:100%;height:100%;object-fit:contain;background:#07070A;" data-om-id="0d88f0b4:200">
+      <div class="cap" data-om-id="0d88f0b4:201">IN-GAME · 자동 생성 노드맵</div>
+    </div>
+
+    <div class="reel" data-om-id="0d88f0b4:202"><span class="sq" data-om-id="0d88f0b4:203"></span> STIGMA <b data-om-id="0d88f0b4:204">·</b> REEL 07</div>
+    <div class="pgn" data-om-id="0d88f0b4:205">07 / 15</div>
+    <div class="tc" data-om-id="0d88f0b4:206">00:08:11:20</div>
+  </section>
+
+
+  <!-- ════ 8 · COMBAT ════ -->
+  <section class="feat" data-screen-label="08 카드 전투" data-om-id="0d88f0b4:207" data-om-validate="no_overflowing_text,no_overlapping_text,slide_sized_text" data-deck-slide="7">
+    <div class="bleed" style="background:linear-gradient(120deg,#0C0B0F,#100E13)" data-om-id="0d88f0b4:208"></div>
+    <div class="redwash glow" style="background:radial-gradient(circle at 86% 80%, rgba(218,41,28,0.16), transparent 52%)" data-om-id="0d88f0b4:209"></div>
+    <div class="frame-edge" data-om-id="0d88f0b4:210"></div>
+
+    <div class="panel left narrow" data-om-id="0d88f0b4:211">
+      <div class="fno" data-om-id="0d88f0b4:212">FEATURE 04</div>
+      <div class="ttl" data-om-id="0d88f0b4:213">카드 전투</div>
+      <div class="en" data-om-id="0d88f0b4:214">Turn-Based Card Combat</div>
+      <div class="lead" data-om-id="0d88f0b4:215">손에 든 카드로 <b data-om-id="0d88f0b4:216">외신의 권속과 맞선다.</b> 턴제 전투의 모든 흐름이 작동한다.</div>
+      <div class="caps" data-om-id="0d88f0b4:217">
+        <div class="cap" data-om-id="0d88f0b4:218"><span class="mk" data-om-id="0d88f0b4:219">▸</span><div data-om-id="0d88f0b4:220">카드 사용 → 효과 처리 → 턴 종료<small data-om-id="0d88f0b4:221">전투 루프 전 구간 구현</small></div></div>
+        <div class="cap" data-om-id="0d88f0b4:222"><span class="mk" data-om-id="0d88f0b4:223">▸</span><div data-om-id="0d88f0b4:224">적 의도(Intent) 미리보기<small data-om-id="0d88f0b4:225">다음 행동을 읽고 대응</small></div></div>
+        <div class="cap" data-om-id="0d88f0b4:226"><span class="mk" data-om-id="0d88f0b4:227">▸</span><div data-om-id="0d88f0b4:228">버프 · 디버프 상태이상<small data-om-id="0d88f0b4:229">중첩 · 지속 · 만료 자동 처리</small></div></div>
+      </div>
+    </div>
+
+    <div class="figframe" data-om-id="0d88f0b4:230">
+      <div class="corner-tl" data-om-id="0d88f0b4:231"></div><div class="corner-br" data-om-id="0d88f0b4:232"></div>
+      <video src="assets/combat_demo.mp4" autoplay muted loop playsinline style="width:100%;height:100%;object-fit:contain;background:#07070A;" data-om-id="0d88f0b4:233"></video>
+      <div class="cap" data-om-id="0d88f0b4:234">IN-GAME · 카드 전투</div>
+    </div>
+
+    <div class="reel" data-om-id="0d88f0b4:235"><span class="sq" data-om-id="0d88f0b4:236"></span> STIGMA <b data-om-id="0d88f0b4:237">·</b> REEL 08</div>
+    <div class="pgn" data-om-id="0d88f0b4:238">08 / 15</div>
+    <div class="tc" data-om-id="0d88f0b4:239">00:09:37:09</div>
+  </section>
+
+
+  <!-- ════ 9 · ENCOUNTER ════ -->
+  <section class="feat" data-screen-label="10 외신과의 조우" data-om-id="0d88f0b4:240" data-om-validate="no_overflowing_text,no_overlapping_text,slide_sized_text" data-deck-slide="9" data-deck-active="">
+    <div class="bleed" style="background:linear-gradient(120deg,#0C0B0F,#100E13)" data-om-id="0d88f0b4:241"></div>
+    <div class="redwash glow" style="background:radial-gradient(circle at 84% 28%, rgba(218,41,28,0.17), transparent 54%)" data-om-id="0d88f0b4:242"></div>
+    <div class="frame-edge" data-om-id="0d88f0b4:243"></div>
+
+    <div class="panel left narrow" data-om-id="0d88f0b4:244">
+      <div class="fno" data-om-id="0d88f0b4:245">FEATURE 05</div>
+      <div class="ttl" data-om-id="0d88f0b4:246">외신과의 조우</div>
+      <div class="en" data-om-id="0d88f0b4:247">Encounter</div>
+      <div class="lead" data-om-id="0d88f0b4:248">1~3장, 각 장을 여는 노드에서 <b data-om-id="0d88f0b4:249">외신 중 하나를 무작위로</b> 마주한다. 누구를 만나느냐가 런의 결을 바꾼다.</div>
+      <div class="caps" data-om-id="0d88f0b4:250">
+        <div class="cap" data-om-id="0d88f0b4:251"><span class="mk" data-om-id="0d88f0b4:252">▸</span><div data-om-id="0d88f0b4:253">특별한 능력 부여<small data-om-id="0d88f0b4:254">조건 없이 권능을 내리는 외신</small></div></div>
+        <div class="cap" data-om-id="0d88f0b4:255"><span class="mk" data-om-id="0d88f0b4:256">▸</span><div data-om-id="0d88f0b4:257">대가를 치르는 거래<small data-om-id="0d88f0b4:258">자원·체력을 지불하고 더 강한 능력</small></div></div>
+        <div class="cap" data-om-id="0d88f0b4:259"><span class="mk" data-om-id="0d88f0b4:260">▸</span><div data-om-id="0d88f0b4:261">보상 획득<small data-om-id="0d88f0b4:262">카드·재화 등 즉시 보상</small></div></div>
+      </div>
+    </div>
+
+    <div class="figframe" data-om-id="0d88f0b4:263">
+      <div class="corner-tl" data-om-id="0d88f0b4:264"></div><div class="corner-br" data-om-id="0d88f0b4:265"></div>
+      <img src="assets/encounter_demo.gif?v=2" alt="외신 조우" style="width:100%;height:100%;object-fit:contain;background:#07070A;" data-om-id="0d88f0b4:266">
+      <div class="cap" data-om-id="0d88f0b4:267">IN-GAME · 외신 조우</div>
+    </div>
+
+    <div class="pgn" data-om-id="0d88f0b4:268">09 / 15</div>
+  </section><section class="feat" data-screen-label="09 상점" data-om-id="0d88f0b4:269" data-om-validate="no_overflowing_text,no_overlapping_text,slide_sized_text" data-deck-slide="8">
+    <div class="bleed" style="background:linear-gradient(120deg,#0C0B0F,#100E13)" data-om-id="0d88f0b4:270"></div>
+    <div class="redwash glow" style="background:radial-gradient(circle at 84% 72%, rgba(218,41,28,0.16), transparent 54%)" data-om-id="0d88f0b4:271"></div>
+    <div class="frame-edge" data-om-id="0d88f0b4:272"></div>
+
+    <div class="panel left narrow" data-om-id="0d88f0b4:273">
+      <div class="fno" data-om-id="0d88f0b4:274">FEATURE 06</div>
+      <div class="ttl" data-om-id="0d88f0b4:275">상점</div>
+      <div class="en" data-om-id="0d88f0b4:276">Shop</div>
+      <div class="lead" data-om-id="0d88f0b4:277">노드 사이, 모은 <b data-om-id="0d88f0b4:278">골드로 전력을 보강한다.</b> 무엇을 사고 무엇을 포기할지 — 또 하나의 선택.</div>
+      <div class="caps" data-om-id="0d88f0b4:279">
+        <div class="cap" data-om-id="0d88f0b4:280"><span class="mk" data-om-id="0d88f0b4:281">▸</span><div data-om-id="0d88f0b4:282">카드 구매<small data-om-id="0d88f0b4:283">새 카드로 덱을 강화</small></div></div>
+        <div class="cap" data-om-id="0d88f0b4:284"><span class="mk" data-om-id="0d88f0b4:285">▸</span><div data-om-id="0d88f0b4:286">리롤 · 체력 교환<small data-om-id="0d88f0b4:287">골드로 상품 갱신, 체력 회복</small></div></div>
+      </div>
+    </div>
+
+    <div class="figframe" data-om-id="0d88f0b4:288">
+      <div class="corner-tl" data-om-id="0d88f0b4:289"></div><div class="corner-br" data-om-id="0d88f0b4:290"></div>
+      <video src="assets/shop_demo.mp4" autoplay muted loop playsinline style="width:100%;height:100%;object-fit:contain;background:#07070A;" data-om-id="0d88f0b4:291"></video>
+      <div class="cap" data-om-id="0d88f0b4:292">IN-GAME · 상점</div>
+    </div>
+
+    <div class="pgn" data-om-id="0d88f0b4:293">10 / 15</div>
+  </section>
+
+
+  <!-- ════ 10 · SHOP ════ -->
+  
+
+  <!-- ════ GAMEPLAY ════ -->
+  <section class="cut" data-screen-label="11 게임플레이" data-om-id="0d88f0b4:294" data-om-validate="no_overflowing_text,no_overlapping_text,slide_sized_text" data-deck-slide="10">
+    <div class="bleed" style="background:#000" data-om-id="0d88f0b4:295"></div>
+    <div class="frame-edge" data-om-id="0d88f0b4:296"></div>
+
+    <div class="cut-stage" data-om-id="0d88f0b4:297">
+      <video class="cut-video" muted="" playsinline="" loop="" preload="metadata" data-src="assets/gameplay_full.mp4" data-om-id="0d88f0b4:298"></video>
+      <div class="cut-ph" data-om-id="0d88f0b4:299">게임플레이 영상 로딩 중…</div>
+      <button class="cut-toggle paused" type="button" aria-label="재생/정지" data-om-id="0d88f0b4:301">
+        <span class="ico-pause" data-om-id="0d88f0b4:302">❚❚</span><span class="ico-play" data-om-id="0d88f0b4:303">▶</span>
+      </button>
+    </div>
+
+    <div class="cut-title" data-om-id="0d88f0b4:304">게임<em data-om-id="0d88f0b4:305">플레이</em></div>
+
+    <div class="pgn" data-om-id="0d88f0b4:306">11 / 15</div>
+  </section>
+
+
+  <!-- ════ 10 · SYSTEMS / OPTIONS ════ -->
+  <section class="sys" data-screen-label="12 시스템·옵션" data-om-id="0d88f0b4:307" data-om-validate="no_overflowing_text,no_overlapping_text,slide_sized_text" data-deck-slide="11">
+    <div class="bleed" style="background:linear-gradient(135deg,#0B0B0F,#0E0E13)" data-om-id="0d88f0b4:308"></div>
+    <div class="redwash glow" style="background:radial-gradient(circle at 50% 110%, rgba(218,41,28,0.12), transparent 55%)" data-om-id="0d88f0b4:309"></div>
+    <div class="frame-edge" data-om-id="0d88f0b4:310"></div>
+
+    <div class="head content" data-om-id="0d88f0b4:311">
+      <div class="overline" data-om-id="0d88f0b4:312">시스템 · 편의 기능</div>
+      <div class="kho" style="font-size:66px; margin-top:24px; white-space:nowrap;" data-om-id="0d88f0b4:313">게임을 떠받치는 것들</div>
+      <div class="rule-red" style="margin-top:28px;" data-om-id="0d88f0b4:314"></div>
+    </div>
+
+    <div class="modules" data-om-id="0d88f0b4:315">
+      <div class="mod"><div class="ok">구현</div><div class="nm">게임 매니저</div><div class="en">GAME MANAGER</div><div class="ds">전역 상태 · 전체 시스템 총괄</div></div>
+      <div class="mod" data-om-id="0d88f0b4:316"><div class="ok" data-om-id="0d88f0b4:317">구현</div><div class="nm" data-om-id="0d88f0b4:318">씬 매니저</div><div class="en" data-om-id="0d88f0b4:319">SCENE MANAGER</div><div class="ds" data-om-id="0d88f0b4:320">인트로·메뉴·인게임 끊김 없는 전환</div></div>
+      <div class="mod" data-om-id="0d88f0b4:321"><div class="ok" data-om-id="0d88f0b4:322">구현</div><div class="nm" data-om-id="0d88f0b4:323">UI 매니저</div><div class="en" data-om-id="0d88f0b4:324">UI MANAGER</div><div class="ds" data-om-id="0d88f0b4:325">메뉴·HUD·팝업 상태 일괄 관리</div></div>
+      <div class="mod" data-om-id="0d88f0b4:326"><div class="ok" data-om-id="0d88f0b4:327">구현</div><div class="nm" data-om-id="0d88f0b4:328">사운드 매니저</div><div class="en" data-om-id="0d88f0b4:329">SOUND MANAGER</div><div class="ds" data-om-id="0d88f0b4:330">BGM·효과음 재생 및 볼륨 제어</div></div>
+      <div class="mod" data-om-id="0d88f0b4:331"><div class="ok" data-om-id="0d88f0b4:332">구현</div><div class="nm" data-om-id="0d88f0b4:333">데이터 매니저</div><div class="en" data-om-id="0d88f0b4:334">DATA MANAGER</div><div class="ds" data-om-id="0d88f0b4:335">런 진행·세이브 데이터 보존</div></div>
+      <div class="mod"><div class="ok">구현</div><div class="nm">옵션 시스템</div><div class="en">OPTIONS</div><div class="ds">볼륨 조절 · 전체 화면 전환 등 환경 설정</div></div>
+    </div>
+
+    <div class="reel" data-om-id="0d88f0b4:355"><span class="sq" data-om-id="0d88f0b4:356"></span> STIGMA <b data-om-id="0d88f0b4:357">·</b> REEL 10</div>
+    <div class="pgn" data-om-id="0d88f0b4:358">12 / 15</div>
+    <div class="tc" data-om-id="0d88f0b4:359">00:12:29:05</div>
+  </section>
+
+
+  <!-- ════ 11 · ART GALLERY ════ -->
+  <section class="gal" data-screen-label="13 아트 갤러리" data-om-id="0d88f0b4:360" data-om-validate="no_overflowing_text,no_overlapping_text,slide_sized_text" data-deck-slide="12">
+    <div class="bleed" style="background:linear-gradient(135deg,#0A0A0E,#0E0E13)" data-om-id="0d88f0b4:361"></div>
+    <div class="frame-edge" data-om-id="0d88f0b4:362"></div>
+
+    <div class="head content" data-om-id="0d88f0b4:363">
+      <div class="overline" data-om-id="0d88f0b4:364">아트 · 세계관</div>
+      <div class="kho" style="font-size:66px; margin-top:24px; white-space:nowrap;" data-om-id="0d88f0b4:365">세계를 채우는 것들</div>
+      <div class="rule-red" style="margin-top:28px;" data-om-id="0d88f0b4:366"></div>
+    </div>
+
+    <div class="grid" data-om-id="0d88f0b4:367">
+      <div class="cell hero" data-om-id="0d88f0b4:368"><img src="assets/protagonist_frames.png" alt="주인공 공격 모션" style="object-fit:contain;background:#07070A;" data-om-id="0d88f0b4:369"><div class="lblbg" data-om-id="0d88f0b4:370"></div><div class="lbl" data-om-id="0d88f0b4:371" style="white-space:nowrap;">낙인자 · 주인공</div></div>
+      <div class="cell" data-om-id="0d88f0b4:372"><img src="assets/art_character.png" alt="등장인물" style="width:100%;height:100%;object-fit:contain;background:#07070A;" data-om-id="0d88f0b4:373"><div class="lblbg" data-om-id="0d88f0b4:374"></div><div class="lbl" data-om-id="0d88f0b4:375">등장인물</div></div>
+      <div class="cell" data-om-id="0d88f0b4:376"><img src="assets/art_icon.png" alt="아이콘" style="width:100%;height:100%;object-fit:contain;background:#07070A;padding:48px;box-sizing:border-box;" data-om-id="0d88f0b4:377"><div class="lblbg" data-om-id="0d88f0b4:378"></div><div class="lbl" data-om-id="0d88f0b4:379">아이콘</div></div>
+      <div class="cell" data-om-id="0d88f0b4:380"><img src="assets/art_card.png" alt="카드 디자인" style="width:100%;height:100%;object-fit:contain;background:#07070A;" data-om-id="0d88f0b4:381"><div class="lblbg" data-om-id="0d88f0b4:382"></div><div class="lbl" data-om-id="0d88f0b4:383" style="white-space:nowrap;">카드 디자인</div></div>
+      <div class="cell" data-om-id="0d88f0b4:384"><img src="assets/art_monster.png" alt="몬스터" style="width:100%;height:100%;object-fit:contain;background:#07070A;" data-om-id="0d88f0b4:385"><div class="lblbg" data-om-id="0d88f0b4:386"></div><div class="lbl" data-om-id="0d88f0b4:387">몬스터</div></div>
+    </div>
+
+    <div class="reel" data-om-id="0d88f0b4:388"><span class="sq" data-om-id="0d88f0b4:389"></span> STIGMA <b data-om-id="0d88f0b4:390">·</b> REEL 11</div>
+    <div class="pgn" data-om-id="0d88f0b4:391">13 / 15</div>
+    <div class="tc" data-om-id="0d88f0b4:392">00:13:50:22</div>
+  </section>
+
+
+  <!-- ════ 12 · STATUS / ROADMAP ════ -->
+  <section class="road" data-screen-label="14 현재 상태·로드맵" data-om-id="0d88f0b4:393" data-om-validate="no_overflowing_text,no_overlapping_text,slide_sized_text" data-deck-slide="13">
+    <div class="bleed" style="background:linear-gradient(135deg,#0B0B0F,#0E0E13)" data-om-id="0d88f0b4:394"></div>
+    <div class="redwash glow" style="background:radial-gradient(circle at 30% 16%, rgba(218,41,28,0.13), transparent 50%)" data-om-id="0d88f0b4:395"></div>
+    <div class="frame-edge" data-om-id="0d88f0b4:396"></div>
+
+    <div class="head content" data-om-id="0d88f0b4:397">
+      <div class="overline" data-om-id="0d88f0b4:398">빌드 현황</div>
+      <div class="kho" style="font-size:66px; margin-top:24px; white-space:nowrap;" data-om-id="0d88f0b4:399">여기까지 작동한다</div>
+      <div class="rule-red" style="margin-top:28px;" data-om-id="0d88f0b4:400"></div>
+    </div>
+
+    <div class="cols" data-om-id="0d88f0b4:401">
+      <div class="col now" data-om-id="0d88f0b4:402">
+        <div class="ch" data-om-id="0d88f0b4:403"><span class="dot" data-om-id="0d88f0b4:404"></span> NOW · 작동 중</div>
+        <div class="it" data-om-id="0d88f0b4:405"><span class="mk" data-om-id="0d88f0b4:406">▸</span> 시선 · 낙인 핵심 메커닉</div>
+        <div class="it" data-om-id="0d88f0b4:407"><span class="mk" data-om-id="0d88f0b4:408">▸</span> 절차적 노드맵 생성</div>
+        <div class="it" data-om-id="0d88f0b4:409"><span class="mk" data-om-id="0d88f0b4:410">▸</span> 턴제 카드 전투 · 버프/디버프</div>
+        <div class="it"><span class="mk">▸</span> 외신 조우 · 상점</div>
+        <div class="it" data-om-id="0d88f0b4:411"><span class="mk" data-om-id="0d88f0b4:412">▸</span> 컷씬 · 메뉴 · 옵션 · 매니저</div>
+      </div>
+      <div class="col next" data-om-id="0d88f0b4:413">
+        <div class="ch" data-om-id="0d88f0b4:414"><span class="dot" data-om-id="0d88f0b4:415"></span> NEXT · 로드맵</div>
+        <div class="it" data-om-id="0d88f0b4:416"><span class="mk" data-om-id="0d88f0b4:417">▸</span> 카드 풀 · 몬스터 다양성 확장</div>
+        <div class="it" data-om-id="0d88f0b4:418"><span class="mk" data-om-id="0d88f0b4:419">▸</span> 보상 · 엔딩 분기 완성</div>
+        <div class="it" data-om-id="0d88f0b4:420"><span class="mk" data-om-id="0d88f0b4:421">▸</span> 밸런싱 · 콘텐츠 볼륨업</div>
+        <div class="it" data-om-id="0d88f0b4:422"><span class="mk" data-om-id="0d88f0b4:423">▸</span> 연출 · 사운드 폴리싱</div>
+      </div>
+    </div>
+
+    <div class="reel" data-om-id="0d88f0b4:424"><span class="sq" data-om-id="0d88f0b4:425"></span> STIGMA <b data-om-id="0d88f0b4:426">·</b> REEL 12</div>
+    <div class="pgn" data-om-id="0d88f0b4:427">14 / 15</div>
+    <div class="tc" data-om-id="0d88f0b4:428">00:15:18:00</div>
+  </section>
+
+
+  <!-- ════ 13 · CREDITS + QR ════ -->
+  <section class="cred" data-screen-label="15 크레딧" data-om-id="0d88f0b4:429" data-om-validate="no_overflowing_text,no_overlapping_text,slide_sized_text" data-deck-slide="14" data-deck-last-visible="">
+    <div class="bleed noir" style="background-image:url('assets/red_eye_scene.png'); filter:grayscale(0.8) contrast(1.05) brightness(0.32)" data-om-id="0d88f0b4:430"></div>
+    <div class="redwash glow" style="background:radial-gradient(ellipse 50% 50% at 50% 30%, rgba(218,41,28,0.2), transparent 60%); mix-blend-mode:screen;" data-om-id="0d88f0b4:431"></div>
+    <div class="scrim-b" data-om-id="0d88f0b4:432"></div>
+    <div class="frame-edge" data-om-id="0d88f0b4:433"></div>
+
+    <div class="center" data-om-id="0d88f0b4:434">
+      <div class="pre" data-om-id="0d88f0b4:435">짱돌 · STIGMA</div>
+      <div class="roll" data-om-id="0d88f0b4:436">
+        <div class="crow" data-om-id="0d88f0b4:437"><div class="role" data-om-id="0d88f0b4:438">Director · Programming</div><div class="nm" data-om-id="0d88f0b4:439">박재환</div></div>
+        <div class="crow" data-om-id="0d88f0b4:440"><div class="role" data-om-id="0d88f0b4:441">Art</div><div class="nm" data-om-id="0d88f0b4:442">정산성</div></div>
+        <div class="crow" data-om-id="0d88f0b4:443"><div class="role" data-om-id="0d88f0b4:444">Game Design</div><div class="nm multi" data-om-id="0d88f0b4:445">변진수 · 백강인 · 소재민</div></div>
+      </div>
+    </div>
+
+    <div class="reel" data-om-id="0d88f0b4:448"><span class="sq" data-om-id="0d88f0b4:449"></span> STIGMA <b data-om-id="0d88f0b4:450">·</b> REEL 13</div>
+    <div class="tc" data-om-id="0d88f0b4:451">00:16:40:00</div>
+  </section>
+
+</deck-stage>
+
+<script>
+  (function () {
+    var cut = document.querySelector('section.cut');
+    if (!cut) return;
+    var vid = cut.querySelector('.cut-video');
+    var playTimer = null;
+
+    function activate() {
+      if (vid && vid.dataset.src && !vid.getAttribute('src')) {
+        vid.setAttribute('src', vid.dataset.src);
+      }
+      clearTimeout(playTimer);
+      // start the cutscene right as the title finishes sliding away
+      playTimer = setTimeout(function () {
+        if (!cut.hasAttribute('data-deck-active') || !vid) return;
+        try { vid.currentTime = 0; } catch (e) {}
+        var p = vid.play();
+        if (p && p.catch) p.catch(function () {});
+      }, 3500);
+    }
+    if (vid) {
+      vid.addEventListener('error', function () { vid.removeAttribute('src'); });
+    }
+    function deactivate() {
+      clearTimeout(playTimer);
+      if (vid) { vid.pause(); try { vid.currentTime = 0; } catch (e) {} }
+    }
+
+    var obs = new MutationObserver(function () {
+      if (cut.hasAttribute('data-deck-active')) activate();
+      else deactivate();
+    });
+    obs.observe(cut, { attributes: true, attributeFilter: ['data-deck-active'] });
+    if (cut.hasAttribute('data-deck-active')) activate();
+
+    // click the video to toggle sound (cutscenes autoplay muted)
+    if (vid) vid.addEventListener('click', function () { vid.muted = !vid.muted; });
+
+    // play/pause button
+    var toggle = cut.querySelector('.cut-toggle');
+    if (toggle && vid) {
+      function syncIcon() { toggle.classList.toggle('paused', vid.paused); }
+      toggle.addEventListener('click', function (e) {
+        e.stopPropagation();
+        if (!vid.getAttribute('src') && vid.dataset.src) vid.setAttribute('src', vid.dataset.src);
+        if (vid.paused) { var p = vid.play(); if (p && p.catch) p.catch(function(){}); }
+        else { vid.pause(); }
+        syncIcon();
+      });
+      vid.addEventListener('play', syncIcon);
+      vid.addEventListener('pause', syncIcon);
+    }
+  })();
+</script>
+
+</body>
+</html>
