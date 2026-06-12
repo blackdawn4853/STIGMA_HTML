@@ -1,0 +1,999 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<title>스티그마 — 개인 기여 포트폴리오 · 박재환</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Black+Han+Sans&family=Oswald:wght@300;400;500;600;700&family=Noto+Sans+KR:wght@300;400;500;700;900&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<script src="assets/deck-stage.js"></script>
+<style>
+  :root {
+    --void: #07070A;
+    --panel: #0E0E12;
+    --panel-2: #16161C;
+    --panel-3: #1C1C23;
+    --bone: #ECE6DB;
+    --bone-dim: #A9A39A;
+    --ash: #6E6A64;
+    --ash-2: #403D39;
+    --blood: #DA291C;
+    --blood-2: #F03A2C;
+    --blood-deep: #6E140D;
+    --line: #24232A;
+    --line-2: #34323B;
+    --ok: #C9B07D;
+    --poster: 'Black Han Sans', 'Noto Sans KR', sans-serif;
+    --cond: 'Oswald', 'Noto Sans KR', sans-serif;
+    --sans: 'Noto Sans KR', sans-serif;
+    --mono: 'JetBrains Mono', ui-monospace, monospace;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; background: #000; }
+  deck-stage { --slide-w: 1920px; --slide-h: 1080px; background: #000; }
+  deck-stage > section {
+    width: 1920px; height: 1080px;
+    background: var(--void); color: var(--bone);
+    font-family: var(--sans); position: relative; overflow: hidden;
+  }
+  /* subtle grain + soft vignette — dialed down for a calmer portfolio read */
+  section::before {
+    content: ''; position: absolute; inset: 0; z-index: 60; pointer-events: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    opacity: 0.045; mix-blend-mode: overlay;
+  }
+  section::after {
+    content: ''; position: absolute; inset: 0; z-index: 55; pointer-events: none;
+    background: radial-gradient(ellipse 86% 76% at 50% 44%, transparent 48%, rgba(0,0,0,0.42) 100%);
+  }
+
+  /* chrome */
+  .pgn { position: absolute; bottom: 54px; left: 72px; z-index: 40; font-family: var(--cond); font-size: 22px; letter-spacing: 0.3em; color: var(--ash); }
+  .sig { position: absolute; bottom: 54px; right: 72px; z-index: 40; font-family: var(--cond); font-size: 20px; letter-spacing: 0.22em; color: var(--ash); text-transform: uppercase; }
+  .frame-edge { position: absolute; inset: 40px; z-index: 38; pointer-events: none; border: 1px solid rgba(236,230,219,0.07); }
+
+  /* image / wash helpers */
+  .bleed { position: absolute; inset: 0; z-index: 1; background-position: center; background-size: cover; background-repeat: no-repeat; }
+  .bleed.noir { filter: grayscale(0.72) contrast(1.04) brightness(0.55); }
+  .redwash { position: absolute; inset: 0; z-index: 2; pointer-events: none; }
+  .redwash.glow { background: radial-gradient(ellipse 60% 55% at 62% 40%, rgba(218,41,28,0.22), transparent 62%); mix-blend-mode: screen; }
+  .scrim-b { position: absolute; inset: 0; z-index: 3; pointer-events: none; background: linear-gradient(180deg, transparent 30%, rgba(7,7,10,0.72) 72%, var(--void) 100%); }
+  .scrim-l { position: absolute; inset: 0; z-index: 3; pointer-events: none; background: linear-gradient(90deg, rgba(7,7,10,0.94) 0%, rgba(7,7,10,0.55) 42%, transparent 72%); }
+
+  /* type atoms */
+  .overline { font-family: var(--cond); font-size: 22px; font-weight: 600; letter-spacing: 0.42em; color: var(--blood); text-transform: uppercase; }
+  .kho { font-family: var(--poster); color: var(--bone); line-height: 1.0; letter-spacing: 0.01em; }
+  .rule-red { width: 92px; height: 4px; background: var(--blood); }
+  .head { position: absolute; left: 96px; top: 132px; z-index: 20; }
+  .head .kho { font-size: 64px; margin-top: 24px; white-space: nowrap; }
+  .head .rule-red { margin-top: 26px; }
+  .tag {
+    font-family: var(--cond); font-size: 22px; font-weight: 600; letter-spacing: 0.22em;
+    text-transform: uppercase; color: var(--bone); border: 1px solid rgba(218,41,28,0.4);
+    padding: 13px 24px; white-space: nowrap; border-radius: 2px;
+    background: linear-gradient(180deg, rgba(218,41,28,0.10), rgba(20,16,18,0.5));
+  }
+
+  /* shared entrance helper for active slide */
+  @keyframes fadeUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+  @keyframes drawDown { from { transform: scaleY(0); } to { transform: scaleY(1); } }
+
+  /* ════════ 1 · COVER ════════ */
+  .cover .eye {
+    position: absolute; left: 50%; top: 50%; transform: translate(-50%,-50%);
+    width: 360px; height: 360px; z-index: 12; pointer-events: none; mix-blend-mode: screen;
+    background: radial-gradient(circle, rgba(255,246,220,0.85) 0%, rgba(255,186,84,0.72) 10%, rgba(236,82,30,0.48) 26%, rgba(150,28,12,0.18) 46%, transparent 68%);
+    filter: blur(2.5px); animation: eyeGlow 4s ease-in-out infinite;
+  }
+  .cover .eye::after {
+    content: ''; position: absolute; left: 50%; top: 50%; transform: translate(-50%,-50%);
+    width: 50px; height: 50px; border-radius: 50%;
+    background: radial-gradient(circle, #fff 0%, #ffefc6 36%, rgba(255,160,50,0.55) 72%, transparent 100%); filter: blur(1.5px);
+  }
+  @keyframes eyeGlow { 0%,100% { opacity: 0.62; transform: translate(-50%,-50%) scale(0.95);} 50% { opacity: 0.92; transform: translate(-50%,-50%) scale(1.05);} }
+  @media (prefers-reduced-motion: reduce) { .cover .eye, .end .eye2, .dir .eye3 { animation: none; } }
+  .cover .billing { position: absolute; top: 150px; left: 0; right: 0; z-index: 20; text-align: center; font-family: var(--cond); font-size: 23px; font-weight: 500; letter-spacing: 0.5em; color: var(--bone-dim); text-transform: uppercase; }
+  .cover h1 { position: absolute; left: 0; right: 0; top: 356px; margin: 0; z-index: 21; text-align: center; font-family: var(--poster); font-size: 122px; line-height: 0.98; color: var(--bone); letter-spacing: 0.01em; }
+  .cover h1 em { font-style: normal; color: var(--blood); }
+  .cover .logo { position: absolute; left: 50%; top: 312px; transform: translateX(-50%); width: 900px; z-index: 21; filter: drop-shadow(0 14px 46px rgba(0,0,0,0.7)); }
+  .cover .logline { position: absolute; left: 0; right: 0; top: 664px; z-index: 21; text-align: center; font-family: var(--sans); font-weight: 400; font-size: 30px; color: var(--bone-dim); letter-spacing: 0.02em; }
+  .cover .logline b { color: var(--bone); font-weight: 600; }
+  .cover .who { position: absolute; left: 50%; bottom: 116px; transform: translateX(-50%); z-index: 21; display: flex; border: 1px solid var(--line-2); background: rgba(10,10,14,0.4); }
+  .cover .who div { padding: 22px 46px; text-align: center; border-right: 1px solid var(--line-2); }
+  .cover .who div:last-child { border-right: none; }
+  .cover .who .k { font-family: var(--cond); font-size: 20px; font-weight: 500; letter-spacing: 0.28em; color: var(--ash); text-transform: uppercase; }
+  .cover .who .v { font-family: var(--poster); font-size: 32px; color: var(--bone); margin-top: 10px; letter-spacing: 0.02em; white-space: nowrap; }
+  .cover .who .v em { font-style: normal; color: var(--blood); }
+
+  /* ════════ 2 · SCOPE ════════ */
+  .scope .lead { position: absolute; left: 96px; top: 300px; z-index: 20; font-family: var(--sans); font-weight: 400; font-size: 30px; color: var(--bone-dim); line-height: 1.55; max-width: 1320px; word-break: keep-all; }
+  .scope .lead b { color: var(--bone); font-weight: 600; }
+  .scope .lead em { font-style: normal; color: var(--blood); font-weight: 700; }
+  .scope .wrap { position: absolute; left: 96px; right: 96px; top: 440px; z-index: 20; display: grid; grid-template-columns: 1fr 392px; gap: 40px; align-items: start; }
+  .scope .owned { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+  .scope .oc { border: 1px solid var(--line); background: var(--panel-2); padding: 26px 28px 30px; position: relative; min-height: 168px; }
+  .scope .oc .ck { position: absolute; top: 24px; right: 26px; color: var(--blood); font-family: var(--mono); font-size: 22px; }
+  .scope .oc .nm { font-family: var(--poster); font-size: 29px; color: var(--bone); line-height: 1.15; }
+  .scope .oc .en { font-family: var(--mono); font-size: 18px; letter-spacing: 0.12em; color: var(--ash); margin-top: 10px; }
+  .scope .oc .ds { font-family: var(--sans); font-weight: 400; font-size: 22px; color: var(--bone-dim); margin-top: 16px; line-height: 1.45; word-break: keep-all; }
+  .scope .side { display: flex; flex-direction: column; gap: 16px; }
+  .scope .stat { border: 1px solid var(--line-2); background: linear-gradient(180deg, rgba(218,41,28,0.09), var(--panel)); padding: 28px 34px; }
+  .scope .stat .big { font-family: var(--poster); font-size: 92px; line-height: 0.9; color: var(--blood); }
+  .scope .stat .lb { font-family: var(--sans); font-size: 22px; color: var(--bone); margin-top: 12px; font-weight: 500; line-height: 1.4; }
+  .scope .excl { border: 1px solid var(--line); border-left: 3px solid var(--ash-2); background: rgba(255,255,255,0.015); padding: 26px 30px; }
+  .scope .excl .t { font-family: var(--cond); font-size: 20px; font-weight: 600; letter-spacing: 0.3em; color: var(--ash); text-transform: uppercase; }
+  .scope .excl .b { font-family: var(--sans); font-size: 22px; color: var(--bone-dim); margin-top: 12px; line-height: 1.45; }
+  .scope .excl .b s { color: var(--ash-2); }
+
+  /* ════════ 3 · ARCHITECTURE ════════ */
+  .arch .diagram { position: absolute; left: 96px; right: 96px; top: 348px; z-index: 20; }
+  .arch .top { width: 540px; margin: 0 auto; text-align: center; border: 1.5px solid var(--blood); background: linear-gradient(180deg, rgba(218,41,28,0.12), rgba(20,16,18,0.6)); padding: 24px 0 22px; }
+  .arch .top .nm { font-family: var(--mono); font-size: 30px; font-weight: 700; color: var(--bone); letter-spacing: 0.04em; }
+  .arch .top .ds { font-family: var(--sans); font-weight: 400; font-size: 22px; color: var(--bone-dim); margin-top: 8px; }
+  .arch .stem { width: 2px; height: 40px; background: var(--line-2); margin: 0 auto; transform-origin: top; }
+  .arch .cols { display: grid; grid-template-columns: repeat(5, 1fr); gap: 20px; padding-top: 40px; position: relative; }
+  .arch .node { position: relative; border: 1px solid var(--line-2); background: var(--panel-2); padding: 22px 22px 24px; }
+  .arch .node::before { content: ''; position: absolute; top: -40px; left: 50%; width: 2px; height: 40px; background: var(--line-2); transform: translateX(-50%) scaleY(1); transform-origin: top; }
+  .arch .node .tk { font-family: var(--mono); font-size: 18px; letter-spacing: 0.16em; color: var(--blood); }
+  .arch .node .nm { font-family: var(--mono); font-size: 23px; font-weight: 600; color: var(--bone); margin-top: 12px; letter-spacing: 0.02em; }
+  .arch .node .ds { font-family: var(--sans); font-weight: 400; font-size: 20px; color: var(--bone-dim); margin-top: 12px; line-height: 1.4; word-break: keep-all; }
+  .arch .data { margin-top: 42px; border: 1px dashed var(--line-2); background: rgba(218,41,28,0.035); padding: 22px 32px; display: flex; align-items: center; gap: 28px; }
+  .arch .data .lb { font-family: var(--cond); font-size: 20px; font-weight: 600; letter-spacing: 0.24em; color: var(--blood); white-space: nowrap; text-transform: uppercase; }
+  .arch .data .items { display: flex; gap: 12px; flex-wrap: wrap; }
+  .arch .chip { font-family: var(--mono); font-size: 20px; letter-spacing: 0.06em; color: var(--bone-dim); border: 1px solid var(--line-2); border-radius: 3px; padding: 8px 16px; background: var(--panel-2); }
+  /* build-up animation */
+  .arch[data-deck-active] .top { animation: fadeUp 0.5s ease-out both; }
+  .arch[data-deck-active] .stem { animation: drawDown 0.3s ease-out 0.45s both; }
+  .arch[data-deck-active] .node { animation: fadeUp 0.5s ease-out both; }
+  .arch[data-deck-active] .node:nth-child(1) { animation-delay: 0.6s; }
+  .arch[data-deck-active] .node:nth-child(2) { animation-delay: 0.72s; }
+  .arch[data-deck-active] .node:nth-child(3) { animation-delay: 0.84s; }
+  .arch[data-deck-active] .node:nth-child(4) { animation-delay: 0.96s; }
+  .arch[data-deck-active] .node:nth-child(5) { animation-delay: 1.08s; }
+  .arch[data-deck-active] .data { animation: fadeUp 0.5s ease-out 1.25s both; }
+  @media (prefers-reduced-motion: reduce) { .arch[data-deck-active] * { animation: none !important; } }
+
+  /* ════════ 4 · SCENE FLOW ════════ */
+  .flow .track { position: absolute; left: 96px; right: 96px; top: 372px; z-index: 20; display: flex; align-items: stretch; }
+  .flow .fn { flex: 1; position: relative; padding: 0 12px; }
+  .flow .fb { border: 1px solid var(--line-2); background: var(--panel-2); padding: 30px 16px 32px; text-align: center; height: 100%; }
+  .flow .fb.entry { border-color: var(--bone-dim); }
+  .flow .fb.game { border-color: var(--blood); background: linear-gradient(180deg, rgba(218,41,28,0.10), var(--panel-2)); }
+  .flow .fb .ix { font-family: var(--mono); font-size: 20px; color: var(--blood); letter-spacing: 0.2em; }
+  .flow .fb .nm { font-family: var(--poster); font-size: 27px; color: var(--bone); margin-top: 14px; line-height: 1.18; }
+  .flow .fb .en { font-family: var(--mono); font-size: 18px; color: var(--ash); margin-top: 10px; letter-spacing: 0.08em; }
+  .flow .fn:not(:last-child)::after { content: '▶'; position: absolute; right: -8px; top: 50%; transform: translateY(-50%); color: var(--blood); font-size: 20px; z-index: 2; }
+  .flow .loop { position: absolute; left: 96px; right: 96px; top: 632px; z-index: 20; border: 1px solid var(--line); background: var(--panel); padding: 34px 40px; }
+  .flow .loop .hd { font-family: var(--cond); font-size: 20px; font-weight: 600; letter-spacing: 0.24em; color: var(--blood); text-transform: uppercase; }
+  .flow .loop .steps { display: flex; align-items: center; gap: 20px; margin-top: 22px; }
+  .flow .loop .st { font-family: var(--mono); font-size: 23px; color: var(--bone); white-space: nowrap; }
+  .flow .loop .sep { color: var(--blood); font-size: 20px; }
+  .flow .loop .note { font-family: var(--sans); font-weight: 400; font-size: 23px; color: var(--bone-dim); margin-top: 22px; line-height: 1.5; word-break: keep-all; }
+
+  /* ════════ 5-7 · SYSTEM DETAIL (code) ════════ */
+  .sysd .row { position: absolute; left: 96px; right: 96px; top: 344px; z-index: 20; display: grid; grid-template-columns: 1fr 1fr; gap: 52px; align-items: start; }
+  .sysd .lcol { display: flex; flex-direction: column; gap: 24px; }
+  .sysd .pt { border-left: 3px solid var(--blood); padding: 4px 0 4px 26px; }
+  .sysd .pt .h { font-family: var(--poster); font-size: 29px; color: var(--bone); line-height: 1.22; }
+  .sysd .pt .d { font-family: var(--sans); font-weight: 400; font-size: 22px; color: var(--bone-dim); margin-top: 11px; line-height: 1.55; word-break: keep-all; }
+  .sysd .pt .d b { color: var(--ok); font-weight: 500; font-family: var(--mono); font-size: 22px; }
+  .codeframe { border: 1px solid var(--line-2); background: var(--panel); overflow: hidden; }
+  .codeframe .bar { display: flex; align-items: center; gap: 9px; padding: 13px 20px; border-bottom: 1px solid var(--line); background: var(--panel-2); }
+  .codeframe .bar .dot { width: 11px; height: 11px; border-radius: 50%; }
+  .codeframe .bar .fn { font-family: var(--mono); font-size: 20px; color: var(--ash); margin-left: 10px; letter-spacing: 0.04em; }
+  .codeframe pre { margin: 0; padding: 24px 28px; font-family: var(--mono); font-size: 17.5px; line-height: 1.72; color: var(--bone-dim); white-space: pre; overflow: hidden; }
+  .codeframe .kw { color: #D98A7A; } .codeframe .ty { color: #7DA9C9; } .codeframe .fnname { color: var(--ok); }
+  .codeframe .cm { color: var(--ash-2); font-style: italic; } .codeframe .st { color: #8FB07D; }
+  .codenote { font-family: var(--cond); font-size: 20px; letter-spacing: 0.18em; color: var(--ash); text-transform: uppercase; margin-top: 16px; text-align: right; }
+
+  /* demo: status tick bars */
+  .tickdemo { margin-top: 18px; display: flex; flex-direction: column; gap: 14px; }
+  .tickdemo .tr { display: grid; grid-template-columns: 232px 1fr 58px; align-items: center; gap: 16px; }
+  .tickdemo .tr .lab { font-family: var(--sans); font-size: 24px; font-weight: 600; color: var(--bone); }
+  .tickdemo .tr .lab small { display: block; font-family: var(--mono); font-size: 18px; font-weight: 500; color: var(--bone-dim); letter-spacing: 0.02em; margin-top: 4px; }
+  .tickdemo .tr .bar { height: 16px; background: var(--panel-3); border: 1px solid var(--line-2); position: relative; overflow: hidden; }
+  .tickdemo .tr .bar .fl { position: absolute; left: 0; top: 0; bottom: 0; background: linear-gradient(90deg, var(--blood-deep), var(--blood)); }
+  .tickdemo .tr.buff .bar .fl { background: linear-gradient(90deg, #4a5a36, var(--ok)); }
+  .tickdemo .tr .stk { font-family: var(--mono); font-size: 23px; color: var(--blood); text-align: right; }
+  .tickdemo .tr.buff .stk { color: var(--ok); }
+  .tickdemo[data-deck-active] .tr.s1 .fl { animation: tickDecay1 6s linear infinite; }
+  .tickdemo[data-deck-active] .tr.s2 .fl { animation: tickDecay2 6s linear infinite; }
+  .tickdemo[data-deck-active] .tr.s3 .fl { animation: tickDecay3 6s linear infinite; }
+  @keyframes tickDecay1 { 0%{width:100%} 30%{width:66%} 60%{width:33%} 90%,100%{width:0%} }
+  @keyframes tickDecay2 { 0%{width:80%} 40%{width:60%} 70%{width:40%} 100%{width:20%} }
+  @keyframes tickDecay3 { 0%{width:100%} 50%{width:50%} 100%{width:0%} }
+  @media (prefers-reduced-motion: reduce) { .tickdemo[data-deck-active] .fl { animation: none !important; } }
+
+  /* demo: spawn weighted bar */
+  .spawnbars { display: flex; flex-direction: column; gap: 18px; margin-top: 10px; }
+  .spawnbars .sb { display: grid; grid-template-columns: 150px 1fr 56px; align-items: center; gap: 18px; }
+  .spawnbars .sb .lab { font-family: var(--sans); font-size: 23px; color: var(--bone); }
+  .spawnbars .sb .t2 { height: 18px; background: var(--panel-3); border: 1px solid var(--line-2); position: relative; }
+  .spawnbars .sb .fill { position: absolute; left: 0; top: 0; bottom: 0; background: linear-gradient(90deg, var(--blood-deep), var(--blood)); width: 0; }
+  .spawnbars .sb .pc { font-family: var(--mono); font-size: 22px; color: var(--blood); text-align: right; }
+  .spawnstrip { margin-top: 30px; }
+  .spawnstrip .slab { font-family: var(--cond); font-size: 20px; letter-spacing: 0.2em; color: var(--ash); text-transform: uppercase; margin-bottom: 12px; }
+  .spawnstrip .strip { height: 40px; display: flex; border: 1px solid var(--line-2); position: relative; overflow: hidden; }
+  .spawnstrip .seg { display: flex; align-items: center; justify-content: center; font-family: var(--mono); font-size: 20px; color: var(--bone); }
+  .spawnstrip .seg.s-a { background: rgba(218,41,28,0.5); flex: 62; }
+  .spawnstrip .seg.s-b { background: rgba(218,41,28,0.3); flex: 28; }
+  .spawnstrip .seg.s-c { background: rgba(218,41,28,0.15); flex: 10; }
+  .spawnstrip .needle { position: absolute; top: -6px; bottom: -6px; width: 3px; background: var(--bone); box-shadow: 0 0 10px var(--bone); left: 0; }
+  .sysd[data-deck-active] .spawnbars .fill { animation: growW 1s ease-out 0.3s forwards; }
+  .sysd[data-deck-active] .sb.b1 .fill { --w: 62%; } .sysd[data-deck-active] .sb.b2 .fill { --w: 28%; } .sysd[data-deck-active] .sb.b3 .fill { --w: 10%; }
+  @keyframes growW { to { width: var(--w); } }
+  .sysd[data-deck-active] .spawnstrip .needle { animation: rollNeedle 5.5s cubic-bezier(.3,0,.2,1) infinite; }
+  @keyframes rollNeedle { 0%{left:2%} 12%{left:88%} 24%{left:30%} 38%{left:74%} 52%{left:18%} 66%{left:50%} 80%{left:42%} 100%{left:42%} }
+  @media (prefers-reduced-motion: reduce) { .sysd[data-deck-active] .fill { animation: none !important; width: var(--w) !important; } .sysd[data-deck-active] .needle { animation: none !important; left: 42% !important; } }
+
+  /* encounter roll — slot-reel roulette */
+  .reel { margin-top: 24px; border: 1px solid var(--line-2); background: var(--panel); padding: 22px 0 0; overflow: hidden; }
+  .reel .rlab { font-family: var(--cond); font-size: 20px; letter-spacing: 0.2em; color: var(--ash); text-transform: uppercase; padding: 0 28px; display: flex; justify-content: space-between; align-items: baseline; white-space: nowrap; }
+  .reel .rlab em { font-style: normal; font-family: var(--mono); font-size: 18px; color: var(--blood); letter-spacing: 0.06em; }
+  .reel .vp { position: relative; height: 166px; margin-top: 18px; overflow: hidden; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+  .reel .vp::before, .reel .vp::after { content: ''; position: absolute; top: 0; bottom: 0; width: 130px; z-index: 4; pointer-events: none; }
+  .reel .vp::before { left: 0; background: linear-gradient(90deg, var(--panel), transparent); }
+  .reel .vp::after { right: 0; background: linear-gradient(270deg, var(--panel), transparent); }
+  .reel .track { position: absolute; top: 0; bottom: 0; left: 0; display: flex; will-change: transform; }
+  .reel .cell { flex: 0 0 150px; width: 150px; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px; }
+  .reel .cell .ic { width: 58px; height: 58px; border-radius: 50%; border: 2px solid var(--line-2); background: radial-gradient(circle at 50% 36%, #3a2125, #160d10); }
+  .reel .cell.elite .ic { width: 66px; height: 66px; border-color: var(--blood); background: radial-gradient(circle at 50% 36%, #5a1a16, #220c0b); box-shadow: 0 0 18px rgba(218,41,28,0.5); }
+  .reel .cell .nm { font-family: var(--sans); font-size: 20px; color: var(--bone-dim); }
+  .reel .cell.elite .nm { color: var(--blood); font-weight: 500; }
+  .reel .marker { position: absolute; left: 50%; top: 0; bottom: 0; width: 150px; transform: translateX(-50%); z-index: 5; pointer-events: none; border-left: 2px solid var(--blood); border-right: 2px solid var(--blood); background: rgba(218,41,28,0.06); }
+  .reel .marker::before { content: '▼'; position: absolute; top: 1px; left: 50%; transform: translateX(-50%); color: var(--blood); font-size: 20px; }
+  .reel .marker::after { content: '▲'; position: absolute; bottom: 1px; left: 50%; transform: translateX(-50%); color: var(--blood); font-size: 20px; }
+  .sysd[data-deck-active] .reel .track { animation: reelRoll 5s cubic-bezier(0.16,0.78,0.12,1) infinite; }
+  @keyframes reelRoll { 0% { transform: translateX(0); } 70%, 100% { transform: translateX(-2700px); } }
+  .sysd[data-deck-active] .reel .marker { animation: reelWin 5s ease-out infinite; }
+  @keyframes reelWin { 0%, 62% { background: rgba(218,41,28,0.06); box-shadow: none; } 72% { background: rgba(218,41,28,0.18); box-shadow: inset 0 0 38px rgba(218,41,28,0.5); } 96% { background: rgba(218,41,28,0.18); box-shadow: inset 0 0 38px rgba(218,41,28,0.5); } 100% { background: rgba(218,41,28,0.06); box-shadow: none; } }
+  @media (prefers-reduced-motion: reduce) { .sysd[data-deck-active] .reel .track, .sysd[data-deck-active] .reel .marker { animation: none !important; } }
+
+  /* ════════ 8 · GAZE GAUGE ════════ */
+  .gaze .row { position: absolute; left: 96px; right: 96px; top: 340px; z-index: 20; display: grid; grid-template-columns: 1fr 720px; gap: 64px; align-items: start; }
+  .gaze .lcol { display: flex; flex-direction: column; gap: 24px; }
+  .gaze .pt { border-left: 3px solid var(--blood); padding: 4px 0 4px 26px; }
+  .gaze .pt .h { font-family: var(--poster); font-size: 30px; color: var(--bone); line-height: 1.2; }
+  .gaze .pt .d { font-family: var(--sans); font-weight: 400; font-size: 22px; color: var(--bone-dim); margin-top: 11px; line-height: 1.55; word-break: keep-all; }
+  .gaze .pt .d b { color: var(--ok); font-weight: 500; font-family: var(--mono); font-size: 22px; }
+  .gaze .gauge { border: 1px solid var(--line-2); background: var(--panel); padding: 40px 44px 46px; }
+  .gaze .gauge .ghd { display: flex; justify-content: space-between; align-items: baseline; }
+  .gaze .gauge .ghd .t { font-family: var(--cond); font-size: 22px; font-weight: 600; letter-spacing: 0.26em; color: var(--bone-dim); text-transform: uppercase; white-space: nowrap; }
+  .gaze .gauge .ghd .val { font-family: var(--poster); font-size: 52px; color: var(--blood); }
+  .gaze .gauge .ghd .val small { font-family: var(--mono); font-size: 22px; color: var(--ash); }
+  .gaze .meter { margin-top: 26px; height: 34px; background: var(--panel-3); border: 1px solid var(--line-2); position: relative; overflow: hidden; }
+  .gaze .meter .fill { position: absolute; left: 0; top: 0; bottom: 0; width: 0; background: linear-gradient(90deg, var(--blood-deep), var(--blood), var(--blood-2)); }
+  .gaze .meter .mk { position: absolute; top: 0; bottom: 0; width: 1px; background: rgba(236,230,219,0.25); }
+  .gaze[data-deck-active] .meter .fill { animation: gazeFill 7s ease-in-out infinite; }
+  @keyframes gazeFill { 0%{width:0} 70%{width:100%} 85%{width:100%} 86%{width:0} 100%{width:0} }
+  @media (prefers-reduced-motion: reduce) { .gaze[data-deck-active] .meter .fill { animation: none !important; width: 72% !important; } .gaze[data-deck-active] .thr { opacity: 1 !important; } }
+  .gaze .thrs { margin-top: 30px; display: flex; flex-direction: column; gap: 12px; }
+  .gaze .thr { display: flex; align-items: center; gap: 18px; padding: 14px 18px; border: 1px solid var(--line); background: var(--panel-2); opacity: 0.32; }
+  .gaze .thr .pct { font-family: var(--mono); font-size: 22px; color: var(--blood); width: 64px; }
+  .gaze .thr .nm { font-family: var(--sans); font-size: 23px; color: var(--bone); }
+  .gaze .thr .nm small { color: var(--bone-dim); font-weight: 400; font-size: 22px; margin-left: 10px; }
+  .gaze[data-deck-active] .thr.t1 { animation: thrPulse 7s ease-in-out infinite; animation-delay: 1.0s; }
+  .gaze[data-deck-active] .thr.t2 { animation: thrPulse 7s ease-in-out infinite; animation-delay: 1.9s; }
+  .gaze[data-deck-active] .thr.t3 { animation: thrPulse 7s ease-in-out infinite; animation-delay: 2.8s; }
+  .gaze[data-deck-active] .thr.t4 { animation: thrPulse 7s ease-in-out infinite; animation-delay: 3.7s; }
+  .gaze[data-deck-active] .thr.t5 { animation: thrPulse 7s ease-in-out infinite; animation-delay: 4.7s; }
+  @keyframes thrPulse { 0%,8%{opacity:0.32; border-color:var(--line);} 12%{opacity:1; border-color:var(--blood);} 78%{opacity:1; border-color:var(--blood);} 86%,100%{opacity:0.32; border-color:var(--line);} }
+
+  /* ════════ 9 · STIGMA ════════ */
+  .stig .row { position: absolute; left: 96px; right: 96px; top: 344px; z-index: 20; display: grid; grid-template-columns: 1fr 940px; gap: 56px; align-items: start; }
+  .stig .lcol { display: flex; flex-direction: column; gap: 28px; }
+  .stig .lead { font-family: var(--sans); font-weight: 400; font-size: 26px; color: var(--bone-dim); line-height: 1.55; word-break: keep-all; }
+  .stig .lead b { color: var(--bone); font-weight: 600; }
+  .stig .choices { display: flex; flex-direction: column; gap: 16px; }
+  .stig .ch { border: 1px solid var(--line-2); background: var(--panel-2); padding: 24px 28px; display: flex; gap: 20px; align-items: flex-start; }
+  .stig .ch .mk { font-family: var(--poster); font-size: 30px; color: var(--blood); line-height: 1; }
+  .stig .ch .nm { font-family: var(--poster); font-size: 24px; color: var(--bone); }
+  .stig .ch .ds { font-family: var(--sans); font-weight: 400; font-size: 22px; color: var(--bone-dim); margin-top: 8px; line-height: 1.5; word-break: keep-all; }
+  .stig .impl { border: 1px solid var(--line); border-left: 3px solid var(--blood); padding: 26px 30px; font-family: var(--mono); font-size: 23px; color: var(--bone-dim); line-height: 1.8; }
+  .stig .impl b { color: var(--ok); font-weight: 600; }
+  .stig .fig { border: 1px solid var(--line-2); background: var(--panel-2); padding: 14px; position: relative; }
+  .stig .fig video { display: block; width: 100%; height: 612px; object-fit: contain; background: #07070A; }
+  .stig .fig .cap { position: absolute; bottom: -34px; right: 0; font-family: var(--mono); font-size: 20px; letter-spacing: 0.14em; color: var(--ash); }
+  .corner-tl, .corner-br { position: absolute; width: 20px; height: 20px; border: 2px solid var(--blood); z-index: 4; }
+  .corner-tl { top: -1px; left: -1px; border-right: none; border-bottom: none; }
+  .corner-br { bottom: -1px; right: -1px; border-left: none; border-top: none; }
+
+  /* ════════ 10 · NODE MAP ════════ */
+  .nmap .row { position: absolute; left: 96px; right: 96px; top: 344px; z-index: 20; display: grid; grid-template-columns: 1120px 1fr; gap: 52px; align-items: start; }
+  .nmap .fig { border: 1px solid var(--line-2); background: var(--panel-2); padding: 14px; position: relative; }
+  .nmap .fig img { display: block; width: 100%; height: 576px; object-fit: cover; background: #07070A; }
+  .nmap .fig .cap { position: absolute; bottom: -34px; left: 0; font-family: var(--mono); font-size: 20px; letter-spacing: 0.14em; color: var(--ash); }
+  .nmap .rcol { display: flex; flex-direction: column; gap: 24px; }
+  .nmap .pt { border-left: 3px solid var(--blood); padding: 4px 0 4px 24px; }
+  .nmap .pt .h { font-family: var(--poster); font-size: 27px; color: var(--bone); line-height: 1.2; }
+  .nmap .pt .d { font-family: var(--sans); font-weight: 400; font-size: 22px; color: var(--bone-dim); margin-top: 10px; line-height: 1.5; word-break: keep-all; }
+  .nmap .pt .d b { color: var(--ok); font-weight: 500; font-family: var(--mono); font-size: 20px; }
+  .nmap .small { border: 1px solid var(--line-2); background: var(--panel-2); padding: 10px; }
+  .nmap .small img { display: block; width: 100%; height: 200px; object-fit: cover; background: #07070A; }
+  .nmap .small .c { font-family: var(--mono); font-size: 18px; letter-spacing: 0.1em; color: var(--ash); margin-top: 8px; }
+
+  /* ════════ 11 · ENCOUNTER + SHOP ════════ */
+  .es .row { position: absolute; left: 96px; right: 96px; top: 344px; z-index: 20; display: grid; grid-template-columns: 1fr 1fr; gap: 30px; }
+  .es .col { display: flex; flex-direction: column; }
+  .es .col .lbl { display: flex; align-items: baseline; gap: 16px; margin-bottom: 18px; }
+  .es .col .lbl .nm { font-family: var(--poster); font-size: 36px; color: var(--bone); }
+  .es .col .lbl .en { font-family: var(--mono); font-size: 20px; letter-spacing: 0.16em; color: var(--blood); }
+  .es .fig { border: 1px solid var(--line-2); background: var(--panel-2); padding: 12px; position: relative; }
+  .es .fig img, .es .fig video { display: block; width: 100%; height: 462px; object-fit: cover; background: #07070A; }
+  .es .col .ds { font-family: var(--sans); font-weight: 400; font-size: 23px; color: var(--bone-dim); margin-top: 18px; line-height: 1.45; word-break: keep-all; }
+  .es .col .ds b { color: var(--bone); font-weight: 500; }
+
+  /* ════════ 12 · DIRECTION ════════ */
+  .dir .bg { position: absolute; inset: 0; z-index: 1; background-size: cover; background-position: center; }
+  .dir .eye3 { position: absolute; right: 18%; top: 30%; width: 360px; height: 360px; z-index: 4; pointer-events: none; mix-blend-mode: screen; background: radial-gradient(circle, rgba(255,240,210,0.5) 0%, rgba(236,82,30,0.32) 26%, transparent 64%); filter: blur(4px); animation: eyeGlow 4s ease-in-out infinite; }
+  .dir .scrim-l { background: linear-gradient(90deg, rgba(7,7,10,0.95) 0%, rgba(7,7,10,0.62) 46%, rgba(7,7,10,0.2) 78%); }
+  .dir .panel { position: absolute; left: 96px; top: 300px; width: 880px; z-index: 20; }
+  .dir .panel .lead { font-family: var(--sans); font-weight: 400; font-size: 28px; color: var(--bone-dim); line-height: 1.55; word-break: keep-all; }
+  .dir .panel .lead b { color: var(--bone); font-weight: 600; }
+  .dir .caps { margin-top: 32px; display: flex; flex-direction: column; gap: 18px; }
+  .dir .cap { display: flex; gap: 18px; align-items: flex-start; }
+  .dir .cap .mk { font-family: var(--mono); font-size: 22px; color: var(--blood); margin-top: 3px; }
+  .dir .cap .x { font-family: var(--sans); font-size: 22px; color: var(--bone); line-height: 1.4; }
+  .dir .cap .x small { display: block; font-family: var(--sans); font-weight: 400; font-size: 22px; color: var(--bone-dim); margin-top: 6px; line-height: 1.4; }
+  .dir .thumbs { position: absolute; right: 84px; bottom: 92px; z-index: 20; display: flex; flex-direction: column; gap: 18px; }
+  .dir .thumbs .tb { width: 620px; height: 349px; border: 1px solid var(--line-2); background: #07070A; position: relative; overflow: hidden; }
+  .dir .thumbs .tb img, .dir .thumbs .tb video { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .dir .thumbs .tb .c { position: absolute; left: 16px; bottom: 14px; font-family: var(--mono); font-size: 22px; letter-spacing: 0.1em; color: var(--bone); text-shadow: 0 2px 6px #000; z-index: 2; }
+
+  /* ════════ 13 · INFRA ════════ */
+  .infra .grid { position: absolute; left: 96px; right: 96px; top: 372px; z-index: 20; display: grid; grid-template-columns: repeat(3, 1fr); gap: 22px; }
+  .infra .m { border: 1px solid var(--line); background: var(--panel-2); padding: 30px 34px 34px; position: relative; min-height: 196px; }
+  .infra .m .ok { position: absolute; top: 28px; right: 32px; font-family: var(--cond); font-size: 20px; font-weight: 600; letter-spacing: 0.2em; color: var(--blood); }
+  .infra .m .nm { font-family: var(--poster); font-size: 31px; color: var(--bone); }
+  .infra .m .en { font-family: var(--mono); font-size: 20px; letter-spacing: 0.12em; color: var(--ash); margin-top: 10px; }
+  .infra .m .ds { font-family: var(--sans); font-weight: 400; font-size: 22px; color: var(--bone-dim); margin-top: 18px; line-height: 1.5; word-break: keep-all; }
+
+  /* ════════ 14 · TEAM ════════ */
+  .team .lead { position: absolute; left: 96px; top: 300px; z-index: 20; font-family: var(--sans); font-weight: 400; font-size: 28px; color: var(--bone-dim); line-height: 1.55; max-width: 1300px; word-break: keep-all; }
+  .team .lead b { color: var(--bone); font-weight: 600; }
+  .team .wrap { position: absolute; left: 96px; right: 96px; top: 432px; z-index: 20; display: grid; grid-template-columns: 1.15fr 1fr; gap: 40px; align-items: start; }
+  .team .roster { border: 1px solid var(--line-2); background: var(--panel-2); }
+  .team .roster .rrow { display: grid; grid-template-columns: 1fr auto; align-items: center; padding: 24px 30px; border-bottom: 1px solid var(--line); }
+  .team .roster .rrow:last-child { border-bottom: none; }
+  .team .roster .rrow.me { background: linear-gradient(90deg, rgba(218,41,28,0.10), transparent); border-left: 3px solid var(--blood); }
+  .team .roster .rrow .nm { font-family: var(--poster); font-size: 26px; color: var(--bone); }
+  .team .roster .rrow .nm em { font-style: normal; color: var(--blood); font-size: 20px; font-family: var(--cond); letter-spacing: 0.2em; margin-left: 14px; text-transform: uppercase; }
+  .team .roster .rrow .role { font-family: var(--cond); font-size: 22px; font-weight: 500; letter-spacing: 0.14em; color: var(--bone-dim); text-transform: uppercase; text-align: right; }
+  .team .cards { display: flex; flex-direction: column; gap: 16px; }
+  .team .tc { border: 1px solid var(--line); border-left: 3px solid var(--blood); background: rgba(255,255,255,0.015); padding: 24px 30px; }
+  .team .tc .h { font-family: var(--poster); font-size: 25px; color: var(--bone); }
+  .team .tc .d { font-family: var(--sans); font-weight: 400; font-size: 22px; color: var(--bone-dim); margin-top: 10px; line-height: 1.5; word-break: keep-all; }
+  .team .tc .d b { color: var(--ok); font-weight: 500; }
+
+  /* ════════ 15 · CHALLENGES ════════ */
+  .chal .list { position: absolute; left: 96px; right: 96px; top: 350px; z-index: 20; display: flex; flex-direction: column; gap: 22px; }
+  .chal .it { display: grid; grid-template-columns: 64px 1fr 1.1fr; gap: 40px; align-items: center; border: 1px solid var(--line); background: var(--panel-2); padding: 30px 40px; }
+  .chal .it .no { font-family: var(--poster); font-size: 44px; color: var(--blood); }
+  .chal .it .pr .l { font-family: var(--cond); font-size: 20px; font-weight: 600; letter-spacing: 0.24em; color: var(--ash); text-transform: uppercase; }
+  .chal .it .pr .x { font-family: var(--poster); font-size: 27px; color: var(--bone); margin-top: 10px; line-height: 1.2; }
+  .chal .it .sv { border-left: 1px solid var(--line-2); padding-left: 40px; }
+  .chal .it .sv .l { font-family: var(--cond); font-size: 20px; font-weight: 600; letter-spacing: 0.24em; color: var(--blood); text-transform: uppercase; }
+  .chal .it .sv .x { font-family: var(--sans); font-weight: 400; font-size: 23px; color: var(--bone-dim); margin-top: 10px; line-height: 1.45; word-break: keep-all; }
+  .chal .it .sv .x b { color: var(--bone); font-weight: 500; }
+
+  /* ════════ 16 · OUTCOME ════════ */
+  .out .glow { position: absolute; right: -200px; top: -160px; width: 760px; height: 760px; z-index: 2; background: radial-gradient(circle, rgba(218,41,28,0.12), transparent 64%); pointer-events: none; }
+  .out .achv { position: absolute; left: 96px; right: 96px; top: 350px; z-index: 20; display: grid; grid-template-columns: repeat(4, 1fr); gap: 22px; }
+  .out .ac { border: 1px solid var(--line); background: var(--panel-2); padding: 34px 30px 38px; }
+  .out .ac .big { font-family: var(--poster); font-size: 84px; line-height: 0.9; color: var(--blood); }
+  .out .ac .lb { font-family: var(--sans); font-size: 22px; color: var(--bone); margin-top: 18px; font-weight: 600; line-height: 1.3; }
+  .out .ac .ds { font-family: var(--sans); font-weight: 400; font-size: 22px; color: var(--bone-dim); margin-top: 10px; line-height: 1.45; }
+  .out .retro { position: absolute; left: 96px; right: 96px; top: 706px; z-index: 20; border-left: 3px solid var(--blood); padding-left: 32px; }
+  .out .retro .h { font-family: var(--cond); font-size: 20px; font-weight: 600; letter-spacing: 0.28em; color: var(--blood); text-transform: uppercase; }
+  .out .retro .b { font-family: var(--sans); font-weight: 400; font-size: 24px; color: var(--bone-dim); margin-top: 16px; line-height: 1.6; max-width: 1560px; word-break: keep-all; }
+  .out .retro .b em { font-style: normal; color: var(--bone); font-weight: 600; }
+
+  /* ════════ 17 · CLOSING ════════ */
+  .end .eye2 { position: absolute; left: 50%; top: 42%; transform: translate(-50%,-50%); width: 300px; height: 300px; z-index: 4; pointer-events: none; mix-blend-mode: screen; background: radial-gradient(circle, rgba(255,240,210,0.6) 0%, rgba(236,82,30,0.34) 26%, transparent 64%); filter: blur(4px); animation: eyeGlow 4s ease-in-out infinite; }
+  .end .center { position: absolute; inset: 0; z-index: 20; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; }
+  .end .pre { font-family: var(--cond); font-size: 24px; font-weight: 500; letter-spacing: 0.5em; color: var(--blood); text-transform: uppercase; white-space: nowrap; }
+  .end h2 { font-family: var(--poster); font-size: 92px; color: var(--bone); margin: 36px 0 0; line-height: 1.12; letter-spacing: 0.02em; }
+  .end h2 span { display: block; white-space: nowrap; }
+  .end h2 em { font-style: normal; color: var(--blood); }
+  .end .who { margin-top: 52px; font-family: var(--cond); font-size: 25px; font-weight: 400; letter-spacing: 0.2em; color: var(--bone-dim); text-transform: uppercase; white-space: nowrap; }
+  .end .who b { color: var(--bone); font-weight: 600; }
+</style>
+</head>
+<body>
+
+<deck-stage>
+
+  <!-- ════ 1 · COVER ════ -->
+  <section class="cover" data-screen-label="01 표지">
+    <div class="bleed" style="background:radial-gradient(ellipse 72% 62% at 50% 42%, #15110F 0%, #0A0A0D 58%, #07070A 100%)"></div>
+    <div class="scrim-b"></div>
+    <div class="frame-edge"></div>
+
+    <div class="billing">개인 기여 포트폴리오 · STIGMA</div>
+    <img class="logo" src="assets/stigma_logo.png" alt="STIGMA"/>
+    <div class="logline">기획·아트를 제외한 <b>모든 코드와 연출</b>을 설계하고 구현했습니다</div>
+
+    <div class="who">
+      <div><div class="k">Name</div><div class="v">박재환</div></div>
+      <div><div class="k">Student ID</div><div class="v">2025107986</div></div>
+      <div><div class="k">Role</div><div class="v"><em>프로그래밍 · 연출 · 팀장</em></div></div>
+    </div>
+
+    <div class="pgn">01 / 16</div>
+    <div class="sig">박재환 · STIGMA</div>
+  </section>
+
+
+  <!-- ════ 2 · SCOPE ════ -->
+  <section class="scope" data-screen-label="02 담당 범위">
+    <div class="bleed" style="background:linear-gradient(135deg,#0B0B0F,#100E13)"></div>
+    <div class="redwash glow" style="background:radial-gradient(circle at 88% 14%, rgba(218,41,28,0.11), transparent 52%)"></div>
+    <div class="frame-edge"></div>
+
+    <div class="head">
+      <div class="overline">담당 범위 · OWNERSHIP</div>
+      <div class="kho">내가 맡은 영역</div>
+      <div class="rule-red"></div>
+    </div>
+
+    <div class="lead">기획과 아트를 제외한 <em>게임의 전 시스템과 연출</em>을 단독으로 설계하고 구현했습니다.</div>
+
+    <div class="wrap">
+      <div class="owned">
+        <div class="oc"><div class="ck">✓</div><div class="nm">시스템 구조</div><div class="en">ARCHITECTURE</div><div class="ds">매니저 기반 전역 흐름 설계</div></div>
+        <div class="oc"><div class="ck">✓</div><div class="nm">씬 · 플로우</div><div class="en">SCENE / FLOW</div><div class="ds">인트로·메뉴·옵션·컷씬 전환</div></div>
+        <div class="oc"><div class="ck">✓</div><div class="nm">카드 전투</div><div class="en">COMBAT</div><div class="ds">턴·카드·효과 처리 로직</div></div>
+        <div class="oc"><div class="ck">✓</div><div class="nm">버프·디버프</div><div class="en">STATUS FX</div><div class="ds">상태이상 데이터·적용 규칙</div></div>
+        <div class="oc"><div class="ck">✓</div><div class="nm">몬스터 출몰</div><div class="en">SPAWN</div><div class="ds">가중 확률 인카운터 생성</div></div>
+        <div class="oc"><div class="ck">✓</div><div class="nm">시선·낙인</div><div class="en">GAZE / STIGMA</div><div class="ds">핵심 자원·영구 상태 시스템</div></div>
+        <div class="oc"><div class="ck">✓</div><div class="nm">노드맵·조우·상점</div><div class="en">MAP / SHOP</div><div class="ds">절차적 생성·외신 조우·상점</div></div>
+        <div class="oc"><div class="ck">✓</div><div class="nm">연출</div><div class="en">DIRECTION</div><div class="ds">컷씬·카메라·강림 이펙트</div></div>
+        <div class="oc"><div class="ck">✓</div><div class="nm">인프라 매니저</div><div class="en">INFRA</div><div class="ds">사운드·데이터·UI·옵션</div></div>
+      </div>
+      <div class="side">
+        <div class="stat"><div class="big">100%</div><div class="lb">기획·아트 외<br/>전 코드를 전담</div></div>
+        <div class="excl"><div class="t">NOT IN SCOPE</div><div class="b"><s>기획</s> · <s>아트</s><br/>그 외 모든 것을 구현</div></div>
+      </div>
+    </div>
+
+    <div class="pgn">02 / 16</div>
+    <div class="sig">박재환 · STIGMA</div>
+  </section>
+
+
+  <!-- ════ 3 · ARCHITECTURE ════ -->
+  <section class="arch" data-screen-label="03 시스템 아키텍처">
+    <div class="bleed" style="background:linear-gradient(135deg,#0B0B0F,#0E0E13)"></div>
+    <div class="redwash glow" style="background:radial-gradient(circle at 12% 18%, rgba(218,41,28,0.10), transparent 50%)"></div>
+    <div class="frame-edge"></div>
+
+    <div class="head">
+      <div class="overline">시스템 아키텍처 · STRUCTURE</div>
+      <div class="kho">매니저 중심의 계층 구조</div>
+      <div class="rule-red"></div>
+    </div>
+
+    <div class="diagram">
+      <div class="top"><div class="nm">GameManager</div><div class="ds">전역 상태 · 시스템 총괄 (Singleton)</div></div>
+      <div class="stem"></div>
+      <div class="cols">
+        <div class="node"><div class="tk">SCENE</div><div class="nm">SceneFlow</div><div class="ds">씬 전환 · 컷씬</div></div>
+        <div class="node"><div class="tk">UI</div><div class="nm">UIManager</div><div class="ds">메뉴 · HUD · 옵션</div></div>
+        <div class="node"><div class="tk">BATTLE</div><div class="nm">Combat</div><div class="ds">턴 · 카드 · 효과</div></div>
+        <div class="node"><div class="tk">STATUS</div><div class="nm">BuffSystem</div><div class="ds">버프 · 디버프</div></div>
+        <div class="node"><div class="tk">WORLD</div><div class="nm">Map/Spawn</div><div class="ds">노드맵 · 출몰</div></div>
+      </div>
+      <div class="data">
+        <div class="lb">DATA LAYER ▸</div>
+        <div class="items">
+          <span class="chip">ScriptableObject · CardData</span>
+          <span class="chip">MonsterData</span>
+          <span class="chip">StatusEffectData</span>
+          <span class="chip">SpawnTable</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="pgn">03 / 16</div>
+    <div class="sig">박재환 · STIGMA</div>
+  </section>
+
+
+  <!-- ════ 4 · SCENE FLOW ════ -->
+  <section class="flow" data-screen-label="04 씬 구조 & 플로우">
+    <div class="bleed" style="background:linear-gradient(135deg,#0B0B0F,#0E0E13)"></div>
+    <div class="redwash glow" style="background:radial-gradient(circle at 86% 80%, rgba(218,41,28,0.10), transparent 52%)"></div>
+    <div class="frame-edge"></div>
+
+    <div class="head">
+      <div class="overline">씬 구조 · GAME FLOW</div>
+      <div class="kho">인트로부터 인게임까지 전 구간</div>
+      <div class="rule-red"></div>
+    </div>
+
+    <div class="track">
+      <div class="fn"><div class="fb entry"><div class="ix">00</div><div class="nm">인트로 씬</div><div class="en">INTRO</div></div></div>
+      <div class="fn"><div class="fb"><div class="ix">01</div><div class="nm">스타트 메뉴</div><div class="en">START MENU</div></div></div>
+      <div class="fn"><div class="fb"><div class="ix">02</div><div class="nm">옵션 메뉴</div><div class="en">OPTIONS</div></div></div>
+      <div class="fn"><div class="fb"><div class="ix">03</div><div class="nm">컷씬</div><div class="en">CUTSCENE</div></div></div>
+      <div class="fn"><div class="fb game"><div class="ix">04</div><div class="nm">인게임</div><div class="en">IN-GAME LOOP</div></div></div>
+    </div>
+
+    <div class="loop">
+      <div class="hd">IN-GAME LOOP ▸ 반복 구조</div>
+      <div class="steps">
+        <span class="st">노드 선택</span><span class="sep">→</span>
+        <span class="st">전투 · 조우 · 상점</span><span class="sep">→</span>
+        <span class="st">보상 · 낙인</span><span class="sep">→</span>
+        <span class="st">다음 층</span><span class="sep">↺</span>
+      </div>
+      <div class="note">씬이 바뀌어도 런 진행 상황과 상태가 유지되도록, GameManager가 데이터를 일괄 보존·전달합니다.</div>
+    </div>
+
+    <div class="pgn">04 / 16</div>
+    <div class="sig">박재환 · STIGMA</div>
+  </section>
+
+
+  <!-- ════ 5 · COMBAT ════ -->
+  <section class="sysd" data-screen-label="05 카드 전투">
+    <div class="bleed" style="background:linear-gradient(135deg,#0B0B0F,#0E0E13)"></div>
+    <div class="redwash glow" style="background:radial-gradient(circle at 90% 20%, rgba(218,41,28,0.09), transparent 52%)"></div>
+    <div class="frame-edge"></div>
+
+    <div class="head">
+      <div class="overline">카드 전투 · COMBAT</div>
+      <div class="kho">턴 기반 카드 전투 엔진</div>
+      <div class="rule-red"></div>
+    </div>
+
+    <div class="row">
+      <div class="lcol">
+        <div class="pt"><div class="h">데이터 주도 효과 분기</div><div class="d"><b>ApplyCardEffect</b>의 <b>switch(effectType)</b>가 데미지·방어·다단히트·관통·회복 등 <b>18종</b> 효과를 분기 — 새 카드는 데이터 한 장 추가로 끝납니다.</div></div>
+        <div class="pt"><div class="h">인스턴스 단위 손패 관리</div><div class="d">같은 <b>CardData</b>가 여러 장이어도 <b>handCardIds</b>로 구분해, 시선 비용 보정을 정확한 카드에만 적용합니다.</div></div>
+        <div class="pt"><div class="h">데미지 합성 파이프라인</div><div class="d"><b>CalculateDamage</b>가 근력 가산 → 시선 배율 → 약화 25% 감소를 순서대로 합성합니다.</div></div>
+      </div>
+      <div>
+        <div class="codeframe">
+          <div class="bar"><span class="dot" style="background:#E0564B"></span><span class="dot" style="background:#C9B07D"></span><span class="dot" style="background:#8FB07D"></span><span class="fn">BattleManager.cs</span></div>
+<pre><span class="cm">// 카드 사용 — 비용 확인 → 시선 누적 → 효과 적용</span>
+<span class="kw">public bool</span> <span class="fnname">PlayCardOnMonster</span>(<span class="ty">CardData</span> card, <span class="ty">Monster</span> target, <span class="kw">int</span> id = <span class="st">0</span>) {
+    <span class="kw">int</span> handIndex = <span class="fnname">FindHandIndex</span>(card, id);
+    <span class="kw">if</span> (handIndex &lt; <span class="st">0</span> || !target.IsAlive) <span class="kw">return false</span>;
+
+    <span class="kw">int</span> cost = <span class="fnname">GetCardCost</span>(card, id);
+    <span class="kw">if</span> (currentMana &lt; cost) <span class="kw">return false</span>;   <span class="cm">// 마나 부족</span>
+
+    currentMana -= cost;
+    <span class="fnname">RemoveFromHandAt</span>(handIndex);
+    GazeEffectManager.Instance?.<span class="fnname">OnCardPlayed</span>(card, <span class="kw">true</span>);
+
+    discardPile.<span class="fnname">Add</span>(card);
+    <span class="fnname">ApplyCardEffect</span>(card, target);  <span class="cm">// 데이터 주도 분기</span>
+    <span class="kw">return true</span>;
+}</pre>
+        </div>
+        <div class="codenote">▸ 실제 프로젝트 코드 발췌 · BattleManager.cs</div>
+      </div>
+    </div>
+
+    <div class="pgn">05 / 16</div>
+    <div class="sig">박재환 · STIGMA</div>
+  </section>
+
+
+  <!-- ════ 6 · BUFF/DEBUFF ════ -->
+  <section class="sysd" data-screen-label="06 버프·디버프">
+    <div class="bleed" style="background:linear-gradient(135deg,#0B0B0F,#0E0E13)"></div>
+    <div class="redwash glow" style="background:radial-gradient(circle at 12% 80%, rgba(218,41,28,0.09), transparent 52%)"></div>
+    <div class="frame-edge"></div>
+
+    <div class="head">
+      <div class="overline">버프 · 디버프 · STATUS EFFECT</div>
+      <div class="kho">데이터 주도 상태이상 시스템</div>
+      <div class="rule-red"></div>
+    </div>
+
+    <div class="row">
+      <div class="lcol">
+        <div class="pt"><div class="h">상태 카탈로그 = enum + Get()</div><div class="d">상태이상을 <b>StatusType</b> enum과 <b>StatusInfo.Get()</b> 분기로 정의 — 이름·설명·색을 한 곳에서 관리합니다.</div></div>
+        <div class="pt"><div class="h">새 상태 = 분기 1개</div><div class="d">enum 항목과 <b>case</b> 하나면 끝. 아이콘 미등록 시 <b>색상 사각형으로 자동 폴백</b>됩니다.</div></div>
+        <div class="pt"><div class="h">지속·중첩은 턴 루프에서</div><div class="d">근력·약화·재생의 지속 턴수를 <b>BattleManager</b> 턴 종료에서 일괄 감소·만료합니다.</div></div>
+      </div>
+      <div>
+        <div class="codeframe">
+          <div class="bar"><span class="dot" style="background:#E0564B"></span><span class="dot" style="background:#C9B07D"></span><span class="dot" style="background:#8FB07D"></span><span class="fn">StatusInfo.cs</span></div>
+<pre><span class="kw">public enum</span> <span class="ty">StatusType</span> { Strength, Weak, Regen, OpenEye }
+
+<span class="cm">// 새 상태 = enum 항목 + case 1개</span>
+<span class="kw">public static</span> <span class="ty">Data</span> <span class="fnname">Get</span>(<span class="ty">StatusType</span> t) {
+  <span class="kw">switch</span> (t) {
+    <span class="kw">case</span> StatusType.Strength: <span class="kw">return new</span> <span class="ty">Data</span> {
+      displayName = <span class="st">"근력"</span>,
+      description = <span class="st">"공격 시 데미지가 추가됩니다."</span> };
+    <span class="cm">// Weak / Regen / OpenEye … 같은 패턴으로 추가</span>
+  }
+}</pre>
+        </div>
+        <div class="tickdemo">
+          <div class="tr buff s2"><div class="lab">근력<small>BUFF · 공격 데미지 +</small></div><div class="bar"><div class="fl"></div></div><div class="stk">×3</div></div>
+          <div class="tr s1"><div class="lab">약화<small>DEBUFF · 데미지 −25%</small></div><div class="bar"><div class="fl"></div></div><div class="stk">×2</div></div>
+          <div class="tr buff s3"><div class="lab">재생<small>BUFF · 턴 종료 체력 회복</small></div><div class="bar"><div class="fl"></div></div><div class="stk">×2</div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="pgn">06 / 16</div>
+    <div class="sig">박재환 · STIGMA</div>
+  </section>
+
+
+  <!-- ════ 7 · SPAWN ════ -->
+  <section class="sysd" data-screen-label="07 몬스터 출몰">
+    <div class="bleed" style="background:linear-gradient(135deg,#0B0B0F,#0E0E13)"></div>
+    <div class="redwash glow" style="background:radial-gradient(circle at 88% 78%, rgba(218,41,28,0.09), transparent 52%)"></div>
+    <div class="frame-edge"></div>
+
+    <div class="head">
+      <div class="overline">몬스터 출몰 · SPAWN SYSTEM</div>
+      <div class="kho">인카운터 단위 몬스터 스폰</div>
+      <div class="rule-red"></div>
+    </div>
+
+    <div class="row">
+      <div class="lcol">
+        <div class="pt"><div class="h">인카운터 = 몬스터 조합</div><div class="d">한 전투에 등장할 몬스터를 <b>EncounterData</b>로 정의 — <b>일반 몬스터 여러 마리</b>를 한 판에 함께 배치합니다.</div></div>
+        <div class="pt"><div class="h">좌우 자동 분산 배치</div><div class="d">anchor를 기준으로 마릿수에 따라 좌우 균등 분산(±<b>spacing</b>) — 1·2·3마리 구도가 데이터로 결정됩니다.</div></div>
+        <div class="pt"><div class="h">엘리트는 전용 AI</div><div class="d"><b>bossAIType</b>에 따라 전용 행동 컴포넌트를 부착 — 일반과 엘리트를 데이터로 구분합니다.</div></div>
+      </div>
+      <div>
+        <div class="codeframe">
+          <div class="bar"><span class="dot" style="background:#E0564B"></span><span class="dot" style="background:#C9B07D"></span><span class="dot" style="background:#8FB07D"></span><span class="fn">BattleManager.cs</span></div>
+<pre><span class="cm">// anchor 기준 좌우 균등 분산 — 일반 여러 마리 배치</span>
+<span class="kw">foreach</span> (<span class="kw">var</span> entry <span class="kw">in</span> encounter.entries) {
+    <span class="kw">if</span> (entry?.data == <span class="kw">null</span>) <span class="kw">continue</span>;
+    <span class="cm">// 단독=0, 2마리=±s/2, 3마리=-s/0/+s</span>
+    <span class="kw">float</span> autoX = (idx++ - (validCount-<span class="st">1</span>)*<span class="st">0.5f</span>) * monsterSpacing;
+    <span class="ty">Vector3</span> pos = monsterAnchorPosition + <span class="kw">new</span> <span class="ty">Vector3</span>(autoX, <span class="st">0</span>, <span class="st">0</span>);
+    <span class="kw">var</span> go = <span class="fnname">Instantiate</span>(monsterPrefab, pos, Quaternion.identity);
+    go.<span class="fnname">GetComponent</span>&lt;<span class="ty">Monster</span>&gt;().data = entry.data;
+    <span class="fnname">AttachBossAI</span>(go, entry.data);   <span class="cm">// 엘리트=전용 AI</span>
+}</pre>
+        </div>
+        <div class="reel">
+          <div class="rlab"><span>ENCOUNTER ROLL · 인카운터 추첨</span><em>SPINNING…</em></div>
+          <div class="vp">
+            <div class="track">
+              <div class="cell"><div class="ic"></div><div class="nm">일반</div></div><div class="cell"><div class="ic"></div><div class="nm">일반</div></div><div class="cell elite"><div class="ic"></div><div class="nm">엘리트</div></div><div class="cell"><div class="ic"></div><div class="nm">일반</div></div><div class="cell elite"><div class="ic"></div><div class="nm">엘리트</div></div><div class="cell"><div class="ic"></div><div class="nm">일반</div></div>
+              <div class="cell"><div class="ic"></div><div class="nm">일반</div></div><div class="cell"><div class="ic"></div><div class="nm">일반</div></div><div class="cell elite"><div class="ic"></div><div class="nm">엘리트</div></div><div class="cell"><div class="ic"></div><div class="nm">일반</div></div><div class="cell elite"><div class="ic"></div><div class="nm">엘리트</div></div><div class="cell"><div class="ic"></div><div class="nm">일반</div></div>
+              <div class="cell"><div class="ic"></div><div class="nm">일반</div></div><div class="cell"><div class="ic"></div><div class="nm">일반</div></div><div class="cell elite"><div class="ic"></div><div class="nm">엘리트</div></div><div class="cell"><div class="ic"></div><div class="nm">일반</div></div><div class="cell elite"><div class="ic"></div><div class="nm">엘리트</div></div><div class="cell"><div class="ic"></div><div class="nm">일반</div></div>
+              <div class="cell"><div class="ic"></div><div class="nm">일반</div></div><div class="cell"><div class="ic"></div><div class="nm">일반</div></div><div class="cell elite"><div class="ic"></div><div class="nm">엘리트</div></div><div class="cell"><div class="ic"></div><div class="nm">일반</div></div><div class="cell elite"><div class="ic"></div><div class="nm">엘리트</div></div><div class="cell"><div class="ic"></div><div class="nm">일반</div></div>
+              <div class="cell"><div class="ic"></div><div class="nm">일반</div></div><div class="cell"><div class="ic"></div><div class="nm">일반</div></div><div class="cell elite"><div class="ic"></div><div class="nm">엘리트</div></div><div class="cell"><div class="ic"></div><div class="nm">일반</div></div><div class="cell elite"><div class="ic"></div><div class="nm">엘리트</div></div><div class="cell"><div class="ic"></div><div class="nm">일반</div></div>
+            </div>
+            <div class="marker"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="pgn">07 / 16</div>
+    <div class="sig">박재환 · anchor 기준 자동 분산</div>
+  </section>
+
+
+  <!-- ════ 8 · GAZE ════ -->
+  <section class="gaze" data-screen-label="08 시선 시스템">
+    <div class="bleed" style="background:linear-gradient(135deg,#0B0B0F,#0E0E13)"></div>
+    <div class="redwash glow" style="background:radial-gradient(circle at 78% 30%, rgba(218,41,28,0.12), transparent 54%)"></div>
+    <div class="frame-edge"></div>
+
+    <div class="head">
+      <div class="overline">핵심 메커닉 · GAZE</div>
+      <div class="kho">인지를 자원으로 — 시선</div>
+      <div class="rule-red"></div>
+    </div>
+
+    <div class="row">
+      <div class="lcol">
+        <div class="pt"><div class="h">구간별 효과 풀 (20~100)</div><div class="d">5개 구간마다 4종 효과 풀에서 <b>런 시작 시 1개 무작위 배정</b>(PickRandom) — 같은 게임도 매 런 다른 빌드가 됩니다.</div></div>
+        <div class="pt"><div class="h">버프와 디버프의 양면</div><div class="d">각 효과는 이득과 대가를 함께 — 시선을 올릴수록 강해지지만 디버프 압박도 함께 누적됩니다.</div></div>
+        <div class="pt"><div class="h">100 도달 = 외신의 강림</div><div class="d"><b>TriggerGaze100</b>이 4종 위기 이벤트 중 하나를 발동하고 게이지를 리셋합니다.</div></div>
+      </div>
+      <div class="gauge">
+        <div class="ghd"><div class="t">GAZE GAUGE</div><div class="val">72<small> / 100</small></div></div>
+        <div class="meter">
+          <div class="fill"></div>
+          <div class="mk" style="left:20%"></div><div class="mk" style="left:40%"></div><div class="mk" style="left:60%"></div><div class="mk" style="left:80%"></div>
+        </div>
+        <div class="thrs">
+          <div class="thr t1"><div class="pct">20%</div><div class="nm">첫 균열<small>구간 효과 1 발동</small></div></div>
+          <div class="thr t2"><div class="pct">40%</div><div class="nm">깊어지는 시선<small>구간 효과 2</small></div></div>
+          <div class="thr t3"><div class="pct">60%</div><div class="nm">잠식<small>구간 효과 3</small></div></div>
+          <div class="thr t4"><div class="pct">80%</div><div class="nm">임계<small>구간 효과 4</small></div></div>
+          <div class="thr t5"><div class="pct">100%</div><div class="nm">외신의 강림<small>4종 위기 트리거</small></div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="pgn">08 / 16</div>
+    <div class="sig">박재환 · 구간마다 효과 1개 무작위 배정</div>
+  </section>
+
+
+  <!-- ════ 9 · STIGMA ════ -->
+  <section class="stig" data-screen-label="09 낙인 시스템">
+    <div class="bleed" style="background:linear-gradient(135deg,#0B0B0F,#0E0E13)"></div>
+    <div class="redwash glow" style="background:radial-gradient(circle at 18% 24%, rgba(218,41,28,0.11), transparent 52%)"></div>
+    <div class="frame-edge"></div>
+
+    <div class="head">
+      <div class="overline">핵심 메커닉 · STIGMA</div>
+      <div class="kho">되돌릴 수 없는 선택 — 낙인</div>
+      <div class="rule-red"></div>
+    </div>
+
+    <div class="row">
+      <div class="lcol">
+        <div class="lead">한 번의 선택이 <b>런이 끝날 때까지 영구히</b> 남습니다. 효과 교체와 카드 제거, 양자택일의 무게.</div>
+        <div class="choices">
+          <div class="ch"><div class="mk">A</div><div><div class="nm">시선 효과 영구 교체</div><div class="ds">활성 효과 하나를 다른 풀로 런타임 치환</div></div></div>
+          <div class="ch"><div class="mk">B</div><div><div class="nm">카드 영구 제거</div><div class="ds">덱에서 한 장을 런 종료까지 삭제</div></div></div>
+        </div>
+        <div class="impl">▸ 효과 슬롯을 런타임 치환<br/>▸ 런 단위 덱 상태를 <b>DataManager</b>가 보존<br/>▸ 덱빌딩 + 메타 룰빌딩의 이중 구조</div>
+      </div>
+      <div class="fig">
+        <div class="corner-tl"></div><div class="corner-br"></div>
+        <video src="assets/stigma_demo.mp4" autoplay muted loop playsinline></video>
+        <div class="cap">IN-GAME · 낙인 연출</div>
+      </div>
+    </div>
+
+    <div class="pgn">09 / 16</div>
+    <div class="sig">박재환 · STIGMA</div>
+  </section>
+
+
+  <!-- ════ 10 · NODE MAP ════ -->
+  <section class="nmap" data-screen-label="10 절차적 노드맵">
+    <div class="bleed" style="background:linear-gradient(135deg,#0B0B0F,#0E0E13)"></div>
+    <div class="redwash glow" style="background:radial-gradient(circle at 86% 78%, rgba(218,41,28,0.09), transparent 52%)"></div>
+    <div class="frame-edge"></div>
+
+    <div class="head">
+      <div class="overline">월드 · PROCEDURAL NODE MAP</div>
+      <div class="kho">매 런 새로 짜이는 던전</div>
+      <div class="rule-red"></div>
+    </div>
+
+    <div class="row">
+      <div class="fig">
+        <div class="corner-tl"></div><div class="corner-br"></div>
+        <img src="assets/nodemap_demo.gif" alt="절차적 노드맵 생성"/>
+        <div class="cap">IN-GAME · 절차적으로 생성되는 노드맵 (현재 버전)</div>
+      </div>
+      <div class="rcol">
+        <div class="pt"><div class="h">층마다 자동 생성</div><div class="d">진행할 때마다 경로를 새로 생성 — <b>전투·낙인·상점·이벤트</b> 노드를 규칙대로 배치합니다.</div></div>
+        <div class="pt"><div class="h">노드 타입·연결 규칙</div><div class="d">노드 종류와 분기 연결을 데이터로 제어해, 같은 길이 두 번 나오지 않게 했습니다.</div></div>
+        <div class="pt"><div class="h">플레이어 자유 드로잉</div><div class="d">맵 위에 직접 선을 긋고 표시하며 동선을 계획할 수 있는 메모 기능을 구현했습니다.</div></div>
+      </div>
+    </div>
+
+    <div class="pgn">10 / 16</div>
+    <div class="sig">박재환 · STIGMA</div>
+  </section>
+
+
+  <!-- ════ 11 · ENCOUNTER + SHOP ════ -->
+  <section class="es" data-screen-label="11 외신 조우 & 상점">
+    <div class="bleed" style="background:linear-gradient(135deg,#0B0B0F,#0E0E13)"></div>
+    <div class="redwash glow" style="background:radial-gradient(circle at 50% 110%, rgba(218,41,28,0.09), transparent 54%)"></div>
+    <div class="frame-edge"></div>
+
+    <div class="head">
+      <div class="overline">이벤트 노드 · ENCOUNTER & SHOP</div>
+      <div class="kho">선택이 런을 바꾸는 두 노드</div>
+      <div class="rule-red"></div>
+    </div>
+
+    <div class="row">
+      <div class="col">
+        <div class="lbl"><div class="nm">외신과의 조우</div><div class="en">ENCOUNTER</div></div>
+        <div class="fig">
+          <div class="corner-tl"></div><div class="corner-br"></div>
+          <img src="assets/encounter_demo.gif" alt="외신 조우"/>
+        </div>
+        <div class="ds">각 장의 문턱에서 <b>외신 하나를 무작위로</b> 마주합니다. 권능 부여 · 대가 거래 · 즉시 보상 — 누구를 만나느냐가 런의 결을 바꿉니다.</div>
+      </div>
+      <div class="col">
+        <div class="lbl"><div class="nm">상점</div><div class="en">SHOP</div></div>
+        <div class="fig">
+          <div class="corner-tl"></div><div class="corner-br"></div>
+          <video src="assets/shop_demo.mp4" autoplay muted loop playsinline></video>
+        </div>
+        <div class="ds">노드 사이, 모은 <b>골드로 전력을 보강</b>합니다. 카드 구매 · 리롤 · 체력 교환 — 무엇을 사고 무엇을 포기할지의 선택.</div>
+      </div>
+    </div>
+
+    <div class="pgn">11 / 16</div>
+    <div class="sig">박재환 · STIGMA</div>
+  </section>
+
+
+  <!-- ════ 12 · DIRECTION ════ -->
+  <section class="dir" data-screen-label="12 연출">
+    <div class="bg" style="background-image:url('assets/red_eye_ingame.png')"></div>
+    <div class="redwash" style="background:radial-gradient(ellipse 60% 60% at 74% 38%, rgba(218,41,28,0.22), transparent 62%); mix-blend-mode:screen;"></div>
+    <div class="scrim-l"></div>
+    <div class="eye3"></div>
+    <div class="frame-edge"></div>
+
+    <div class="head">
+      <div class="overline">연출 · DIRECTION</div>
+      <div class="kho">코드 너머의 분위기</div>
+      <div class="rule-red"></div>
+    </div>
+
+    <div class="panel">
+      <div class="lead">시스템뿐 아니라 <b>게임의 연출 전반</b>을 직접 맡았습니다. 인트로·컷씬부터 전투 카메라, 외신 강림의 순간까지 — 코드로 분위기를 만들었습니다.</div>
+      <div class="caps">
+        <div class="cap"><span class="mk">▸</span><div class="x">인트로 · 컷씬 시퀀스<small>페이드·스킵·타이밍을 직접 연출하고 재생 제어</small></div></div>
+        <div class="cap"><span class="mk">▸</span><div class="x">외신 강림 비주얼<small>시선 100 도달 시 붉은 시야 잠식 · 강림 이펙트</small></div></div>
+        <div class="cap"><span class="mk">▸</span><div class="x">2D-3D 하이브리드 카메라<small>탐험과 전투 사이 시점·투영 전환 연출</small></div></div>
+      </div>
+    </div>
+
+    <div class="thumbs">
+      <div class="tb"><img src="assets/combat_3d.png" alt="2D-3D 전투"/><div class="c">2D-3D 전투</div></div>
+      <div class="tb"><video src="assets/gameplay_full.mp4" autoplay muted loop playsinline></video><div class="c">인게임 연출</div></div>
+    </div>
+
+    <div class="pgn">12 / 16</div>
+    <div class="sig">박재환 · 연출·프로그래밍</div>
+  </section>
+
+
+  <!-- ════ 13 · INFRA ════ -->
+  <section class="infra" data-screen-label="13 인프라 매니저">
+    <div class="bleed" style="background:linear-gradient(135deg,#0B0B0F,#0E0E13)"></div>
+    <div class="redwash glow" style="background:radial-gradient(circle at 50% 110%, rgba(218,41,28,0.08), transparent 54%)"></div>
+    <div class="frame-edge"></div>
+
+    <div class="head">
+      <div class="overline">인프라 · 편의 기능 · INFRASTRUCTURE</div>
+      <div class="kho">게임을 떠받치는 매니저들</div>
+      <div class="rule-red"></div>
+    </div>
+
+    <div class="grid">
+      <div class="m"><div class="ok">구현</div><div class="nm">씬 매니저</div><div class="en">SCENE MANAGER</div><div class="ds">인트로·메뉴·인게임 끊김 없는 전환</div></div>
+      <div class="m"><div class="ok">구현</div><div class="nm">UI 매니저</div><div class="en">UI MANAGER</div><div class="ds">메뉴·HUD·팝업 상태 일괄 관리</div></div>
+      <div class="m"><div class="ok">구현</div><div class="nm">사운드 매니저</div><div class="en">SOUND MANAGER</div><div class="ds">BGM·효과음 재생 및 볼륨 제어</div></div>
+      <div class="m"><div class="ok">구현</div><div class="nm">데이터 매니저</div><div class="en">DATA MANAGER</div><div class="ds">런 진행·세이브 데이터 보존</div></div>
+      <div class="m"><div class="ok">구현</div><div class="nm">옵션 시스템</div><div class="en">OPTIONS</div><div class="ds">볼륨 조절·전체 화면 등 환경 설정</div></div>
+      <div class="m"><div class="ok">구현</div><div class="nm">컷씬 연출</div><div class="en">CUTSCENE</div><div class="ds">시퀀스 재생·스킵·페이드 처리</div></div>
+    </div>
+
+    <div class="pgn">13 / 16</div>
+    <div class="sig">박재환 · STIGMA</div>
+  </section>
+
+
+  <!-- ════ 14 · TEAM ════ -->
+  <section class="team" data-screen-label="14 팀 운영 & 협업">
+    <div class="bleed" style="background:linear-gradient(135deg,#0B0B0F,#100E13)"></div>
+    <div class="redwash glow" style="background:radial-gradient(circle at 12% 16%, rgba(218,41,28,0.10), transparent 52%)"></div>
+    <div class="frame-edge"></div>
+
+    <div class="head">
+      <div class="overline">팀 운영 · 협업 · TEAM</div>
+      <div class="kho">팀장으로서 흐름을 잡다</div>
+      <div class="rule-red"></div>
+    </div>
+
+    <div class="lead">5인 팀 <b>'짱돌'</b>의 팀장으로서, 기획·아트가 만든 콘텐츠가 게임 안에서 작동하도록 <b>전 코드를 통합</b>하고 일정을 조율했습니다.</div>
+
+    <div class="wrap">
+      <div class="roster">
+        <div class="rrow me"><div class="nm">박재환 <em>ME</em></div><div class="role">프로그래밍 · 연출 · 팀장</div></div>
+        <div class="rrow"><div class="nm">정산성</div><div class="role">아트</div></div>
+        <div class="rrow"><div class="nm">변진수</div><div class="role">기획</div></div>
+        <div class="rrow"><div class="nm">백강인</div><div class="role">기획</div></div>
+        <div class="rrow"><div class="nm">소재민</div><div class="role">기획</div></div>
+      </div>
+      <div class="cards">
+        <div class="tc"><div class="h">데이터 주도로 분업 가능하게</div><div class="d">카드·상태이상·몬스터를 <b>ScriptableObject</b>로 열어, 기획이 코드 없이 콘텐츠를 채우도록 설계했습니다.</div></div>
+        <div class="tc"><div class="h">통합 담당 · 일정 조율</div><div class="d">아트·기획 산출물을 게임에 붙이는 <b>단일 통합 지점</b>을 맡아, 빌드와 마일스톤을 관리했습니다.</div></div>
+        <div class="tc"><div class="h">단독 구현, 공동의 결과물</div><div class="d">코드는 혼자 책임지되, 시스템의 '느낌'은 팀과 맞추며 조정했습니다.</div></div>
+      </div>
+    </div>
+
+    <div class="pgn">14 / 16</div>
+    <div class="sig">박재환 · 짱돌</div>
+  </section>
+
+
+  <!-- ════ 15 · CHALLENGES ════ -->
+  <section class="chal" data-screen-label="15 기술적 도전">
+    <div class="bleed" style="background:linear-gradient(135deg,#0B0B0F,#0E0E13)"></div>
+    <div class="redwash glow" style="background:radial-gradient(circle at 14% 20%, rgba(218,41,28,0.10), transparent 50%)"></div>
+    <div class="frame-edge"></div>
+
+    <div class="head">
+      <div class="overline">기술적 도전 · PROBLEM SOLVING</div>
+      <div class="kho">막힌 곳을 어떻게 풀었나</div>
+      <div class="rule-red"></div>
+    </div>
+
+    <div class="list">
+      <div class="it">
+        <div class="no">01</div>
+        <div class="pr"><div class="l">PROBLEM</div><div class="x">2D-3D 카메라 전환 시 좌표 오차</div></div>
+        <div class="sv"><div class="l">SOLUTION</div><div class="x"><b>Plane.Raycast</b>로 투영 전환 시 좌표계를 재정합 — 직교↔원근 전환을 안정화했습니다.</div></div>
+      </div>
+      <div class="it">
+        <div class="no">02</div>
+        <div class="pr"><div class="l">PROBLEM</div><div class="x">콘텐츠 추가마다 코드 수정 반복</div></div>
+        <div class="sv"><div class="l">SOLUTION</div><div class="x"><b>ScriptableObject 데이터 주도</b> 설계로 전환 — 카드·상태이상·몬스터를 데이터만 추가해 확장합니다.</div></div>
+      </div>
+      <div class="it">
+        <div class="no">03</div>
+        <div class="pr"><div class="l">PROBLEM</div><div class="x">씬 전환 시 상태·진행 유실</div></div>
+        <div class="sv"><div class="l">SOLUTION</div><div class="x"><b>GameManager·DataManager</b>로 런 상태를 중앙 보존 — 씬이 바뀌어도 진행이 유지됩니다.</div></div>
+      </div>
+    </div>
+
+    <div class="pgn">15 / 16</div>
+    <div class="sig">박재환 · STIGMA</div>
+  </section>
+
+
+  <!-- ════ 16 · OUTCOME ════ -->
+  <section class="out" data-screen-label="16 성과 & 회고">
+    <div class="bleed" style="background:linear-gradient(135deg,#0B0B0F,#0E0E13)"></div>
+    <div class="glow"></div>
+    <div class="frame-edge"></div>
+
+    <div class="head">
+      <div class="overline">성과 요약 · OUTCOME</div>
+      <div class="kho">내가 만든 것</div>
+      <div class="rule-red"></div>
+    </div>
+
+    <div class="achv">
+      <div class="ac"><div class="big">10+</div><div class="lb">핵심 시스템</div><div class="ds">단독 설계·구현</div></div>
+      <div class="ac"><div class="big">5</div><div class="lb">씬 구간</div><div class="ds">인트로→인게임 전 구간</div></div>
+      <div class="ac"><div class="big">100%</div><div class="lb">시스템 코드</div><div class="ds">기획·아트 외 전담</div></div>
+      <div class="ac"><div class="big">1</div><div class="lb">팀 총괄</div><div class="ds">프로그래밍 · 연출 · 팀장</div></div>
+    </div>
+
+    <div class="retro">
+      <div class="h">RETROSPECTIVE · 회고</div>
+      <div class="b">매니저 중심 구조와 <em>데이터 주도 설계</em>로 시스템을 분리해, 콘텐츠 확장이 코드 수정 없이 가능하도록 만들었습니다. 다음 단계는 <em>의존성 정리</em>와 자동 밸런싱 도구입니다.</div>
+    </div>
+
+    <div class="pgn">16 / 16</div>
+    <div class="sig">박재환 · STIGMA</div>
+  </section>
+
+
+  <!-- ════ 17 · CLOSING ════ -->
+  <section class="end" data-screen-label="17 마무리">
+    <div class="bleed noir" style="background-image:url('assets/red_eye_scene.png'); filter:grayscale(0.8) contrast(1.05) brightness(0.34)"></div>
+    <div class="eye2"></div>
+    <div class="redwash glow" style="background:radial-gradient(ellipse 50% 50% at 50% 40%, rgba(218,41,28,0.18), transparent 60%); mix-blend-mode:screen;"></div>
+    <div class="scrim-b"></div>
+    <div class="frame-edge"></div>
+
+    <div class="center">
+      <div class="pre">STIGMA · 개인 기여</div>
+      <h2><span>설계 · 연출</span><span><em>구현</em>까지</span></h2>
+      <div class="who">프로그래밍 · 연출 · 팀장 &nbsp;—&nbsp; <b>박재환</b></div>
+    </div>
+
+    <div class="sig">박재환 · 2025107986</div>
+  </section>
+
+</deck-stage>
+
+</body>
+</html>
